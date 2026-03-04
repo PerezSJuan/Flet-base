@@ -1,61 +1,102 @@
-# Flet-base
+# 🚀 Flet-base Template
 
+A premium starter kit for building multi-platform applications with Python and Flet.
 
+---
 
-## Translation manager
+# 🌍 Translation Manager
 
+A robust and simple utility to manage multi-language support in **Flet** applications. This manager handles CSV-based translations, automatic language detection, and user preference persistence.
 
- ## Function-by-function usage
+## 🚀 Key Features
 
- **`TranslationManager.__init__(csv_path=None, default_lang="en")`**
- - Creates a manager instance and immediately loads the CSV at
-   `csv_path` (or `translations.csv` next to this file).
- - `default_lang` is the fallback language code when a translation
-   is missing.  If you want to use a CSV from another location, simply
-   pass the full path:
+*   **CSV-Powered**: Manage all your strings in a single, easy-to-edit CSV file.
+*   **Auto-Detection**: Automatically initializes with the user's system language (`page.locale`).
+*   **Persistence**: Integrates with `page.shared_preferences` to remember the user's language choice.
+*   **Safe Failover**: Provides recursive fallback (Current Language → Default Language → Key Name).
+*   **Bidirectional Mapping**: Supports converting between ISO codes (e.g., `en`) and human-readable names (e.g., `English`).
 
-     tm = TranslationManager(csv_path="/path/to/my.csv")
+---
 
-   For example, to keep translations in a sibling `data/` folder:
+## 🛠️ Internal Structure & API
 
-     tm = TranslationManager(csv_path=os.path.join(os.getcwd(),
-                                                    "data",
-                                                    "translations.csv"))
+### **Core Methods**
 
-   After initialization the `self.csv_path` attribute holds the actual
-   file location used.
+#### **`TranslationManager(csv_path=None, default_lang="en")`**
+Creates a new manager instance.
+- **`csv_path`**: Optional. Path to your translation file. Defaults to `translations.csv` in the same directory as the module.
+- **`default_lang`**: The fallback language code.
 
- **`get_language_name(code)` / `get_language_code(name)`**
- - These are simple helpers that map ISO codes and human-readable
-   names.  They work independently of any instance and can be called
-   at module level.
- - They fall back to the input if the lookup fails.
+#### **`awake(page: ft.Page)`**
+The essential initialization hook for Flet apps.
+1. Checks `page.shared_preferences` for a saved language.
+2. If not found, attempts to use `page.locale`.
+3. Falls back to `default_lang` if neither is available.
 
- **`awake(page)`**
- - Intended for use with a `flet.Page` object.  It reads the saved
-   language from `page.shared_preferences`, or uses the page locale
-   if nothing is stored.  Changes the active language accordingly and
-   updates the preference.
+#### **`translate(key: str) -> str`**
+The main method for UI strings. 
+- Usage: `tm.translate("welcome_message")`
 
- **`_load_csv()`** (private)
- - Reads the CSV file and populates `self.translations` and
-   `self.available_languages`.  You normally won't call this
-   directly; it is invoked from `__init__`.
+#### **`set_language(lang_code: str)`**
+Updates the active language. Note: This changes the internal state; you should also update `page.shared_preferences` to persist the change.
 
- **`set_language(lang)`**
- - Switch the active language code used by `translate()`.
-   Example: `tm.set_language("es")`.
+### **Utility Helpers**
+- **`get_available_languages()`**: Returns a list of readable names (e.g., `["English", "Español"]`).
+- **`get_language_name(code)`**: Static method. `en` -> `English`.
+- **`get_language_code(name)`**: Static method. `Español` -> `es`.
 
- **`get_available_languages()`**
- - Returns a list of translated language names that appear in the
-   CSV header, e.g. `['English', 'Español', 'Français']`.
+---
 
- **`translate(key)`**
- - Look up a key and return the string in the current active language.
-   Falls back to the default language or returns the key if nothing is
-   found.  This is the method you'll use in UI code.
+## 📊 CSV Format Requirement
 
- ------------------------------------------------------------
- ## Example / small self-test script
+Your `translations.csv` must follow this header structure:
 
- The block in examples is a small self-test script that you can run to see how it works.
+| key | en | es | fr | ... |
+| :--- | :--- | :--- | :--- | :--- |
+| hello | Hello | Hola | Bonjour | ... |
+| login_btn | Login | Iniciar Sesión | Connexion | ... |
+
+> [!TIP]
+> Use standard ISO 639-1 codes (2 letters) for column headers to ensure compatibility with `page.locale`.
+
+---
+
+## 💡 Implementation Example
+
+```python
+import flet as ft
+from translations.translations import TranslationManager
+
+def main(page: ft.Page):
+    # 1. Initialize & Awake
+    tm = TranslationManager()
+    tm.awake(page)
+
+    # 2. Reactive UI Component
+    user_greeting = ft.Text(tm.translate("hello"), size=30, weight="bold")
+
+    def change_lang(code):
+        tm.set_language(code)
+        page.shared_preferences.set("language", code)
+        # Update the UI
+        user_greeting.value = tm.translate("hello")
+        page.update()
+
+    page.add(
+        user_greeting,
+        ft.ElevatedButton(
+            "Change to Spanish", 
+            on_click=lambda _: change_lang("es")
+        )
+    )
+
+ft.app(target=main)
+```
+
+---
+
+## 🧪 Testing
+The `translations.py` file includes a built-in test block. You can run it directly to verify your CSV loading:
+```bash
+python translations/translations.py
+```
