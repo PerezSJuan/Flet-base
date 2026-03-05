@@ -4,6 +4,38 @@ A premium starter kit for building multi-platform applications with Python and F
 
 ---
 
+## 🛠️ Initializing a New Project
+
+This repository serves as a **template** for new Flet-based apps.  You can
+start from scratch using Flet's own project generator and then layer in the
+custom modules that live here.
+
+1. **Create the base application**
+   
+   ```bash
+   flet create my_app
+   cd my_app
+   ```
+   
+   This will generate a minimal Flet project structure (including an
+   `app.py` or similar entry point) and install the core `flet` package.
+
+2. **Install local utility modules**
+   
+   * `components`
+   
+   * `layout`
+   
+   * `router`
+   
+   * `themes`
+   
+   * `translations`
+
+Some modules depends to each other, so it is recomended to install all of them even if you do not use it. 
+
+---
+
 # 🌍 Translation Manager
 
 A robust and simple utility to manage multi-language support in **Flet** applications. This manager handles CSV-based translations, automatic language detection, and user preference persistence.
@@ -167,7 +199,35 @@ falls back to `awake()` behaviour.
 In `themes.py` there are two objects about colors: dark and light theme. You can modify it easily, there is only one limit: you can not have different color names in one palette than in other. Changing some color's name will probably break component scheme, so do it carefuly. 
 
 ```python
+light_theme = {
+    "primary": "#6200EE",
+    "on_primary": "#FFFFFF",
+    "secondary": "#03DAC6",
+    "on_secondary": "#000000",
+    "background": "#FFFFFF",
+    "on_background": "#000000",
+    "surface": "#FFFFFF",
+    "on_surface": "#000000",
+    "error": "#B00020",
+    "on_error": "#FFFFFF",
+    "warning": "#FFB300",
+    "success": "#388E3C",
+}
 
+dark_theme = {
+    "primary": "#BB86FC",
+    "on_primary": "#000000",
+    "secondary": "#03DAC6",
+    "on_secondary": "#000000",
+    "background": "#121212",
+    "on_background": "#FFFFFF",
+    "surface": "#1E1E1E",
+    "on_surface": "#FFFFFF",
+    "error": "#CF6679",
+    "on_error": "#000000",
+    "warning": "#FFB300",
+    "success": "#66BB6A",
+}
 ```
 
 ---
