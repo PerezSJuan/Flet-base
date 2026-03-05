@@ -1,5 +1,7 @@
 import flet as ft
 
+prefs = ft.SharedPreferences()
+
 # A simple palette object used by the application.  You can extend or
 # modify these values as needed; keys correspond to Flet's theme
 # properties (primary, secondary, error, background, surface, etc.).
@@ -65,6 +67,7 @@ class themes:
         """
         page.theme_mode = ft.ThemeMode.DARK
         self.actual_theme = self.dark_theme
+        prefs.set("theme", "dark")
 
     def set_light_theme(self, page):
         """Apply the light color palette to the given Flet page.
@@ -74,6 +77,7 @@ class themes:
         """
         page.theme_mode = ft.ThemeMode.LIGHT
         self.actual_theme = self.light_theme
+        prefs.set("theme", "light")
 
     def switch_theme(self, page):
         """Toggle between light and dark themes.
@@ -92,12 +96,12 @@ class themes:
     def awake(self, page):
         """Initialize theme on page creation.
 
-        Reads the stored value from ``page.shared_preferences`` under the
+        Reads the stored value from ``prefs`` under the
         key "theme".  If found, applies it; otherwise inspects
         ``ft.ThemeMode.SYSTEM`` and the ``default_theme`` provided at
         construction to choose a starting theme, then saves that choice.
         """
-        stored_theme = page.shared_preferences.get("theme")
+        stored_theme = prefs.get("theme")
         if stored_theme:
             if stored_theme == "light":
                 self.set_light_theme(page)
@@ -106,18 +110,14 @@ class themes:
         else:
             if ft.ThemeMode.SYSTEM == ft.ThemeMode.LIGHT:
                 self.set_light_theme(page)
-                page.shared_preferences.set("theme", "light")
+                
             elif ft.ThemeMode.SYSTEM == ft.ThemeMode.DARK:
                 self.set_dark_theme(page)
-                page.shared_preferences.set("theme", "dark")
             else: 
                 if self.default_theme == self.light_theme:
                     self.set_light_theme(page)
-                    page.shared_preferences.set("theme", "light")
                 elif self.default_theme == self.dark_theme:
                     self.set_dark_theme(page)
-                    page.shared_preferences.set("theme", "dark")
                 else:
                     self.set_light_theme(page)
-                    page.shared_preferences.set("theme", "light")
 

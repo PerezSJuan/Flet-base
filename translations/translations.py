@@ -2,6 +2,9 @@ import csv
 import os
 from typing import Dict, List
 
+from flet import SharedPreferences
+
+prefs = SharedPreferences()
 
 # Mapping of language codes to their full names
 LANGUAGE_NAMES = {
@@ -88,7 +91,7 @@ class TranslationManager:
             tm.awake(page)
             # ... rest of the app
         """
-        stored_language = page.shared_preferences.get("language")
+        stored_language = prefs.get("language")
         if stored_language:
             # Ensure we have a language code (in case the full name was saved)
             self.set_language(self.get_language_code(stored_language))
@@ -98,7 +101,7 @@ class TranslationManager:
                 self.set_language(default_language)
             else:
                 self.set_language(self.default_lang)
-            page.shared_preferences.set("language", self.active_lang)
+            prefs.set("language", self.active_lang)
 
     def _load_csv(self) -> None:
         if not os.path.isfile(self.csv_path):
