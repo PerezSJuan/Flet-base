@@ -194,6 +194,8 @@ Apply a specific palette and save the choice. They also update
 Toggle between light and dark. If the current palette is neither, it
 falls back to `awake()` behaviour.
 
+Even if you change theme, app's border might not change color because it is fixed in system configuration, for example in windows. 
+
 ### 🛠️Change theme colors
 
 In `themes.py` there are two objects about colors: dark and light theme. You can modify it easily, there is only one limit: you can not have different color names in one palette than in other. Changing some color's name will probably break component scheme, so do it carefuly. 

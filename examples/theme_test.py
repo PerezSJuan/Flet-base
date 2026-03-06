@@ -17,21 +17,24 @@ if root not in sys.path:
 from themes.themes import themes
 
 
-def main(page):
+async def main(page):
     th = themes()
-    th.awake(page)
+    await th.awake(page)
 
     txt = ft.Text("The quick brown fox", size=24, color=th.actual_theme["primary"])
+    print(f"Initial theme: {th.actual_theme["primary"]}")
 
-    def toggle(_):
-        th.switch_theme(page)
+    async def toggle(_):
+        
+        await th.switch_theme(page)
         # reflect current palette in our text color
         txt.color = th.actual_theme["primary"]
-        page.update()
+        print(f"Switched to {th.actual_theme["primary"]} theme")
+
 
     page.add(
         txt,
-        ft.ElevatedButton("Toggle theme", on_click=toggle),
+        ft.Button("Toggle theme", on_click=toggle),
     )
 
 

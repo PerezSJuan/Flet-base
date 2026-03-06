@@ -1,10 +1,5 @@
 import flet as ft
 
-prefs = ft.SharedPreferences()
-
-# A simple palette object used by the application.  You can extend or
-# modify these values as needed; keys correspond to Flet's theme
-# properties (primary, secondary, error, background, surface, etc.).
 light_theme = {
     "primary": "#6200EE",
     "on_primary": "#FFFFFF",
@@ -37,87 +32,51 @@ dark_theme = {
 
 
 class themes:
-    """Helper class that manages light/dark theme switching.
-
-    Attributes:
-        actual_theme (dict): currently active color dictionary.
-        light_theme (dict): reference to the module-level light theme.
-        dark_theme (dict): reference to the module-level dark theme.
-    """
+    """Helper class that manages light/dark theme switching."""
 
     actual_theme = None
 
     def __init__(self, default_theme=light_theme):
-        """Initialize the manager with a default theme.
-
-        The provided default_theme should be either `light_theme` or
-        `dark_theme`.  The instance keeps references to both palettes
-        and sets `actual_theme` accordingly.
-        """
         self.light_theme = light_theme
         self.dark_theme = dark_theme
         self.default_theme = default_theme
         self.actual_theme = default_theme
 
-    def set_dark_theme(self, page):
-        """Apply the dark color palette to the given Flet page.
-
-        This sets the page's theme_mode to `ThemeMode.DARK` and updates
-        `actual_theme` so clients can read the current color values.
-        """
+    async def set_dark_theme(self, page):
         page.theme_mode = ft.ThemeMode.DARK
         self.actual_theme = self.dark_theme
-        prefs.set("theme", "dark")
+        await page.shared_preferences.set("theme", "dark")
+        page.update()
 
-    def set_light_theme(self, page):
-        """Apply the light color palette to the given Flet page.
-
-        Unlike ``set_dark_theme``, this switches the page to
-        `ThemeMode.LIGHT` and updates ``actual_theme`` accordingly.
-        """
+    async def set_light_theme(self, page):
         page.theme_mode = ft.ThemeMode.LIGHT
         self.actual_theme = self.light_theme
-        prefs.set("theme", "light")
+        await page.shared_preferences.set("theme", "light")
+        page.update()
 
-    def switch_theme(self, page):
-        """Toggle between light and dark themes.
-
-        If the current palette matches `light_theme`, switch to dark, and
-        vice versa.  If the active palette is somehow neither, fall back to
-        `awake()` which chooses based on saved preferences or defaults.
-        """
+    async def switch_theme(self, page):
         if self.actual_theme == self.light_theme:
-            self.set_dark_theme(page)
+            await self.set_dark_theme(page)
         elif self.actual_theme == self.dark_theme:
-            self.set_light_theme(page)
-        else: 
-            self.awake(page)
-    
-    def awake(self, page):
-        """Initialize theme on page creation.
-
-        Reads the stored value from ``prefs`` under the
-        key "theme".  If found, applies it; otherwise inspects
-        ``ft.ThemeMode.SYSTEM`` and the ``default_theme`` provided at
-        construction to choose a starting theme, then saves that choice.
-        """
-        stored_theme = prefs.get("theme")
-        if stored_theme:
-            if stored_theme == "light":
-                self.set_light_theme(page)
-            elif stored_theme == "dark":
-                self.set_dark_theme(page)
+            await self.set_light_theme(page)
         else:
-            if ft.ThemeMode.SYSTEM == ft.ThemeMode.LIGHT:
-                self.set_light_theme(page)
-                
-            elif ft.ThemeMode.SYSTEM == ft.ThemeMode.DARK:
-                self.set_dark_theme(page)
-            else: 
-                if self.default_theme == self.light_theme:
-                    self.set_light_theme(page)
-                elif self.default_theme == self.dark_theme:
-                    self.set_dark_theme(page)
-                else:
-                    self.set_light_theme(page)
+            await self.awake(page)
 
+    async def awake(self, page):
+        stored_theme = await page.shared_preferences.get("theme")
+
+        if stored_theme == "dark":
+            await self.set_dark_theme(page)
+        elif stored_theme == "light":
+            await self.set_light_theme(page)
+        else:
+            try:
+                if page.platform_brightness == ft.Brightness.DARK:
+                    await self.set_dark_theme(page)
+                else:
+                    await self.set_light_theme(page)
+            except Exception:
+                if self.default_theme == self.dark_theme:
+                    await self.set_dark_theme(page)
+                else:
+                    await self.set_light_theme(page)

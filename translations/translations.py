@@ -1,10 +1,7 @@
 import csv
 import os
 from typing import Dict, List
-
-from flet import SharedPreferences
-
-prefs = SharedPreferences()
+import flet as ft
 
 # Mapping of language codes to their full names
 LANGUAGE_NAMES = {
@@ -40,16 +37,14 @@ LANGUAGE_NAMES = {
 
 class TranslationManager:
     """Manages loading and retrieving translations from a CSV file.
-    
+
     The CSV should have a header where the first column is the translation key
     and the subsequent columns are language codes (e.g., 'en', 'es').
     """
 
     def __init__(self, csv_path: str = None, default_lang: str = "en") -> None:
         if csv_path is None:
-            # Default to translations.csv in the same directory as this file
             csv_path = os.path.join(os.path.dirname(__file__), "translations.csv")
-            # If not found, return error
             if not os.path.isfile(csv_path):
                 raise FileNotFoundError(f"Translation CSV not found at {csv_path}")
 
@@ -67,41 +62,45 @@ class TranslationManager:
         """
         return LANGUAGE_NAMES.get(code.lower(), code)
 
-
     @staticmethod
     def get_language_code(name: str) -> str:
         """Returns the code of a language given its name.
         Falls back to the name itself if not found.
         """
-        # Buscamos en los valores del diccionario ignorando mayúsculas/minúsculas
         name_lower = name.lower().strip()
         for code, lang_name in LANGUAGE_NAMES.items():
             if lang_name.lower() == name_lower:
                 return code
         return name
 
-    def awake(self, page=None) -> None:
-        """
-        Initialize user language preferences.
-        To use this in a Flet app, create an instance and call it after
-        initializing the page:
+    async def awake(self, page: ft.Page) -> None:
+        """Initialize user language preferences from shared_preferences.
 
-        def main(page: ft.Page):
-            tm = TranslationManager()
-            tm.awake(page)
-            # ... rest of the app
+        Call this once after the page is ready:
+
+            async def main(page: ft.Page):
+                tm = TranslationManager()
+                await tm.awake(page)
         """
-        stored_language = prefs.get("language")
+        self._page = page
+
+        stored_language = await page.shared_preferences.get("language")
         if stored_language:
             # Ensure we have a language code (in case the full name was saved)
-            self.set_language(self.get_language_code(stored_language))
+            self.active_lang = self.get_language_code(stored_language)
         else:
-            default_language = page.locale
-            if default_language in self.available_languages:
-                self.set_language(default_language)
+            # Try to use the system locale
+            try:
+                default_language = page.locale.language_code
+            except Exception:
+                default_language = None
+
+            if default_language and default_language in self.available_languages:
+                self.active_lang = default_language
             else:
-                self.set_language(self.default_lang)
-            prefs.set("language", self.active_lang)
+                self.active_lang = self.default_lang
+
+            await page.shared_preferences.set("language", self.active_lang)
 
     def _load_csv(self) -> None:
         if not os.path.isfile(self.csv_path):
@@ -110,20 +109,22 @@ class TranslationManager:
         with open(self.csv_path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             if reader.fieldnames:
-                # First column is 'key', rest are languages
-                self.available_languages = reader.fieldnames[1:]
+                self.available_languages = list(reader.fieldnames[1:])
                 key_field = reader.fieldnames[0]
                 for row in reader:
                     key = row.pop(key_field)
                     if key:
-                        # Remove empty columns
                         self.translations[key] = {
                             lang: txt for lang, txt in row.items() if txt
                         }
 
-    def set_language(self, lang: str) -> None:
-        """Change the active language."""
+    async def set_language(self, lang: str, page: ft.Page = None) -> None:
+        """Change the active language and persist the choice."""
         self.active_lang = lang
+        target_page = page or getattr(self, "_page", None)
+        if target_page:
+            await target_page.shared_preferences.set("language", self.active_lang)
+            target_page.update()
 
     def get_available_languages(self) -> List[str]:
         """Return a list of language names available in the CSV."""
@@ -135,6 +136,3 @@ class TranslationManager:
         """
         entry = self.translations.get(key, {})
         return entry.get(self.active_lang) or entry.get(self.default_lang) or key
-    
-    
-    
