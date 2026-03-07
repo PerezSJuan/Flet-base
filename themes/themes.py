@@ -47,13 +47,13 @@ class themes:
     async def set_dark_theme(self, page):
         page.theme_mode = ft.ThemeMode.DARK
         self.actual_theme = self.dark_theme
-        await page.shared_preferences.set("theme", "dark")
+        await ft.SharedPreferences().set("theme", "dark")
         page.update()
 
     async def set_light_theme(self, page):
         page.theme_mode = ft.ThemeMode.LIGHT
         self.actual_theme = self.light_theme
-        await page.shared_preferences.set("theme", "light")
+        await ft.SharedPreferences().set("theme", "light")
         page.update()
 
     async def switch_theme(self, page):
@@ -65,7 +65,7 @@ class themes:
             await self.awake(page)
 
     async def awake(self, page):
-        stored_theme = await page.shared_preferences.get("theme")
+        stored_theme = await ft.SharedPreferences().get("theme")
 
         if stored_theme == "dark":
             await self.set_dark_theme(page)

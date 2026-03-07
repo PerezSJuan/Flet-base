@@ -74,7 +74,7 @@ class TranslationManager:
         return name
 
     async def awake(self, page: ft.Page) -> None:
-        """Initialize user language preferences from shared_preferences.
+        """Initialize user language preferences from SharedPreferences().
 
         Call this once after the page is ready:
 
@@ -84,7 +84,7 @@ class TranslationManager:
         """
         self._page = page
 
-        stored_language = await page.shared_preferences.get("language")
+        stored_language = await ft.SharedPreferences().get("language")
         if stored_language:
             # Ensure we have a language code (in case the full name was saved)
             self.active_lang = self.get_language_code(stored_language)
@@ -100,7 +100,7 @@ class TranslationManager:
             else:
                 self.active_lang = self.default_lang
 
-            await page.shared_preferences.set("language", self.active_lang)
+            await ft.SharedPreferences().set("language", self.active_lang)
 
     def _load_csv(self) -> None:
         if not os.path.isfile(self.csv_path):
@@ -123,7 +123,7 @@ class TranslationManager:
         self.active_lang = lang
         target_page = page or getattr(self, "_page", None)
         if target_page:
-            await target_page.shared_preferences.set("language", self.active_lang)
+            await target_ft.SharedPreferences().set("language", self.active_lang)
             target_page.update()
 
     def get_available_languages(self) -> List[str]:
