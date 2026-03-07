@@ -108,22 +108,22 @@ import flet as ft
 
 import os
 import sys
+import asyncio
 root = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")
 if root not in sis.path:
     sys.path.insert(0,root)
-from translations import TranslationManager
+from translations import instance_translation_manager as tm
 
 
-def main(page: ft.Page):
+async def main(page: ft.Page):
     # 1. Initialize & Awake
-    tm = TranslationManager()
-    tm.awake(page)
+    await tm.awake(page)
 
     # 2. Reactive UI Component
     user_greeting = ft.Text(tm.translate("hello"), size=30, weight="bold")
 
-    def change_lang(code):
-        tm.set_language(code)
+    async def change_lang(code):
+        await tm.set_language(code)
         page.shared_preferences.set("language", code)
         # Update the UI
         user_greeting.value = tm.translate("hello")
@@ -133,7 +133,7 @@ def main(page: ft.Page):
         user_greeting,
         ft.ElevatedButton(
             "Change to Spanish", 
-            on_click=lambda _: change_lang("es")
+            on_click=lambda _: await change_lang("es")
         )
     )
 
@@ -246,7 +246,7 @@ root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root not in sys.path:
     sys.path.insert(0, root)
 
-from themes.themes import themes
+from themes.themes import instance_themes as themes
 
 
 def main(page: ft.Page):
@@ -264,6 +264,63 @@ def main(page: ft.Page):
     page.add(
         txt,
         ft.ElevatedButton("Toggle theme", on_click=on_click),
+    )
+
+ft.app(target=main)
+```
+
+---
+
+# 🔘 Components: Buttons
+
+The `components/buttons.py` module provides a set of pre-styled button helpers that automatically integrate with the active theme. This ensures visual consistency across your application with minimal code.
+
+## 🚀 Key Features
+
+* **Theme Integration**: Buttons automatically use colors from `themes.actual_theme`. **Use themes is required to use any component.**
+* **Simplified API**: Quick creation of common button styles (filled, icon-only, text-only).
+* **State Management**: Easy toggling of the `enabled` state.
+
+---
+
+## 🛠️ API Reference
+
+### **`filled_btn(text, icon=None, on_click=None, enabled=True)`**
+
+Creates a standard filled button using the theme's `primary` color for the background and `on_primary` for the content.
+
+### **`icon_filled_btn(icon, on_click=None, enabled=True)`**
+
+An icon-only version of the filled button.
+
+### **`icon_btn(icon, on_click=None, enabled=True)`**
+
+A transparent background button that uses the `primary` color for the icon itself.
+
+### **`text_btn(text, icon=None, on_click=None, enabled=True)`**
+
+A flat button without a background, useful for secondary actions or navigation links. Uses the theme's `text_color`.
+
+### **`btn(text, icon=None, on_click=None, enabled=True, ...)`**
+
+A more flexible filled button that allows you to specify custom light and dark mode colors manually.
+
+---
+
+## 🧪 Usage Example
+
+```python
+import flet as ft
+from components.buttons import filled_btn, icon_btn, text_btn
+from themes.themes import instance_themes as themes
+
+async def main(page: ft.Page):
+    await themes.awake(page)
+
+    page.add(
+        filled_btn("Submit", on_click=lambda _: print("Submit clicked!")),
+        icon_btn(ft.Icons.DELETE, on_click=lambda _: print("Delete clicked!")),
+        text_btn("Cancel", on_click=lambda _: page.window_close()),
     )
 
 ft.app(target=main)

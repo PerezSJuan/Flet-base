@@ -9,6 +9,7 @@ light_theme = {
     "on_background": "#000000",
     "surface": "#FFFFFF",
     "on_surface": "#000000",
+    "text_color": "#000000",
     "error": "#B00020",
     "on_error": "#FFFFFF",
     "warning": "#FFB300",
@@ -24,6 +25,7 @@ dark_theme = {
     "on_background": "#FFFFFF",
     "surface": "#1E1E1E",
     "on_surface": "#FFFFFF",
+    "text_color": "#FFFFFF",
     "error": "#CF6679",
     "on_error": "#000000",
     "warning": "#FFB300",
@@ -80,3 +82,5 @@ class themes:
                     await self.set_dark_theme(page)
                 else:
                     await self.set_light_theme(page)
+
+instance_themes = themes()

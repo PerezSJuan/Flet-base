@@ -14,23 +14,21 @@ root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root not in sys.path:
     sys.path.insert(0, root)
 
-from themes.themes import themes
+from themes.themes import instance_themes as themes
 
 
 async def main(page):
-    th = themes()
-    await th.awake(page)
+    await themes.awake(page)
 
-    txt = ft.Text("The quick brown fox", size=24, color=th.actual_theme["primary"])
-    print(f"Initial theme: {th.actual_theme["primary"]}")
+    txt = ft.Text("The quick brown fox", size=24, color=themes.actual_theme["primary"])
+    print(f"Initial theme: {themes.actual_theme['primary']}")
 
     async def toggle(_):
-        
-        await th.switch_theme(page)
-        # reflect current palette in our text color
-        txt.color = th.actual_theme["primary"]
-        print(f"Switched to {th.actual_theme["primary"]} theme")
 
+        await themes.switch_theme(page)
+        # reflect current palette in our text color
+        txt.color = themes.actual_theme["primary"]
+        print(f"Switched to {themes.actual_theme['primary']} theme")
 
     page.add(
         txt,
@@ -40,4 +38,5 @@ async def main(page):
 
 if __name__ == "__main__":
     import flet as ft
+
     ft.app(target=main)

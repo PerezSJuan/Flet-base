@@ -8,6 +8,7 @@ you want to exercise a custom file you may pass its path to the manager.
 
 import os
 import sys
+import asyncio
 
 # ensure parent folder (workspace root) is on import path so
 # the `translations` package can be imported when running this script
@@ -16,19 +17,18 @@ root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root not in sys.path:
     sys.path.insert(0, root)
 
-from translations import TranslationManager
+from translations import instance_translation_manager as tm
 
 
-if __name__ == "__main__":
+async def main():
     # print path that will be used by the manager (default package CSV)
-    tm = TranslationManager()  # will raise if the bundled CSV is missing
     print("Using translation CSV:", tm.csv_path)
 
     print("Available language codes:", tm.available_languages)
     print("Available language names:", tm.get_available_languages())
-    
+
     print("Current active language:", tm.active_lang)
-    tm.set_language("es")
+    await tm.set_language("es")
     print("Changed active language to", tm.active_lang)
 
     # interactive key lookup
@@ -37,10 +37,13 @@ if __name__ == "__main__":
         if key.lower() == "quit":
             break
         print(f"[{tm.active_lang}] -> {tm.translate(key)}")
-    
+
     # helper functions
-    print("get_language_name('fr') ->", TranslationManager.get_language_name("fr"))
-    print("get_language_code('Español') ->", TranslationManager.get_language_code("Español"))
+    print("get_language_name('fr') ->", tm.get_language_name("fr"))
+    print("get_language_code('Español') ->", tm.get_language_code("Español"))
 
     print("Example complete.")
 
+
+if __name__ == "__main__":
+    asyncio.run(main())

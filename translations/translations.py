@@ -136,3 +136,5 @@ class TranslationManager:
         """
         entry = self.translations.get(key, {})
         return entry.get(self.active_lang) or entry.get(self.default_lang) or key
+
+instance_translation_manager = TranslationManager()

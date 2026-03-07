@@ -7,10 +7,12 @@ simple drop‑in for Flet applications that require internationalization.
 
 from .translations import (
     TranslationManager,
-    LANGUAGE_NAMES
+    LANGUAGE_NAMES,
+    instance_translation_manager
 )
 
 __all__ = [
     "TranslationManager",
-    "LANGUAGE_NAMES"
+    "LANGUAGE_NAMES",
+    "instance_translation_manager"
 ]
