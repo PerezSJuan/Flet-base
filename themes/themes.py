@@ -83,4 +83,5 @@ class themes:
                 else:
                     await self.set_light_theme(page)
 
+
 instance_themes = themes()

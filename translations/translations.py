@@ -123,7 +123,7 @@ class TranslationManager:
         self.active_lang = lang
         target_page = page or getattr(self, "_page", None)
         if target_page:
-            await target_ft.SharedPreferences().set("language", self.active_lang)
+            await ft.SharedPreferences().set("language", self.active_lang)
             target_page.update()
 
     def get_available_languages(self) -> List[str]:
@@ -136,5 +136,6 @@ class TranslationManager:
         """
         entry = self.translations.get(key, {})
         return entry.get(self.active_lang) or entry.get(self.default_lang) or key
+
 
 instance_translation_manager = TranslationManager()
