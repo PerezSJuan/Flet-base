@@ -403,6 +403,7 @@ The `components/data_display.py` module includes components for presenting data 
 * **Interactive Data**: Simplified `DataTable` integration.
 * **Visual Feedback**: Themed progress bars and loading indicators.
 * **Media Support**: Easy icon and image helpers.
+* **Layout Helpers**: Collapsible panels and themed material cards.
 
 ---
 
@@ -428,25 +429,71 @@ A linear progress bar styled with theme colors (`primary` for progress, `surface
 
 A circular progress ring (loading spinner) using the theme's `primary` color.
 
+### **`expansion_panel(header, content=[], expanded=False)`**
+
+A collapsible panel with a `surface`-themed background. Wrap one or more inside a `ft.ExpansionPanelList` to allow only one open at a time.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `header` | `str` | — | Label shown in the collapsed header bar. |
+| `content` | `list` | `[]` | Flet controls rendered inside the expanded body. |
+| `expanded` | `bool` | `False` | Whether the panel starts already open. |
+
+### **`card(content=[], color=None)`**
+
+A material card with padding and an optional custom background color. Defaults to the theme's `primary` color.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `content` | `list` | `[]` | Flet controls placed inside the card body. |
+| `color` | `str \| None` | `None` | Card background. Falls back to `primary` if omitted. |
+
 ---
 
 ## 🧪 Usage Example
 
 ```python
+import os, sys
 import flet as ft
 
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root not in sys.path:
+    sys.path.insert(0, root)
 
-
-from components.data_display import icon, progress_bar, loading_indicator
+from components.data_display import (
+    icon, progress_bar, loading_indicator,
+    expansion_panel, card,
+)
+from components.texts import body, caption
 from themes.themes import instance_themes as themes
 
 async def main(page: ft.Page):
     await themes.awake(page)
 
     page.add(
+        # Basic display
         icon(ft.Icons.FAVORITE),
         progress_bar(value=0.7),
-        loading_indicator(size=30)
+        loading_indicator(size=30),
+
+        # Collapsible panel
+        ft.ExpansionPanelList(
+            controls=[
+                expansion_panel(
+                    header="Details",
+                    content=[body("Panel content goes here.")],
+                    expanded=True,
+                ),
+            ]
+        ),
+
+        # Material card
+        card(
+            content=[
+                body("A themed card"),
+                caption("Optional sub-text."),
+            ]
+        ),
     )
 
 ft.app(target=main)

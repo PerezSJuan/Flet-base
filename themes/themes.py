@@ -14,6 +14,7 @@ light_theme = {
     "on_error": "#FFFFFF",
     "warning": "#FFB300",
     "success": "#388E3C",
+    "link": "#0000FF",
 }
 
 dark_theme = {
@@ -30,6 +31,7 @@ dark_theme = {
     "on_error": "#000000",
     "warning": "#FFB300",
     "success": "#66BB6A",
+    "link": "#5252FF",
 }
 
 
@@ -48,12 +50,14 @@ class themes:
         page.theme_mode = ft.ThemeMode.DARK
         self.actual_theme = self.dark_theme
         await ft.SharedPreferences().set("theme", "dark")
+        page.bgcolor = self.actual_theme["background"]
         page.update()
 
     async def set_light_theme(self, page):
         page.theme_mode = ft.ThemeMode.LIGHT
         self.actual_theme = self.light_theme
         await ft.SharedPreferences().set("theme", "light")
+        page.bgcolor = self.actual_theme["background"]
         page.update()
 
     async def switch_theme(self, page):

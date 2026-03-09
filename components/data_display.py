@@ -3,6 +3,7 @@ import sys
 import flet as ft
 import flet_datatable2 as fdt
 
+
 # ensure parent folder (workspace root) is on import path
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if root not in sys.path:
@@ -59,4 +60,48 @@ def loading_indicator(size=50):
     """It creates a loading indicator"""
     return ft.ProgressRing(
         width=size, height=size, color=themes.actual_theme["primary"]
+    )
+
+
+def expansion_panel(header, content=[], expanded=False):
+    """It creates an expansion panel with the specified header and content and the main color of the theme"""
+    return ft.ExpansionPanel(
+        header=ft.Container(
+            content=ft.Row([
+                ft.Text(
+                    header, 
+                    size=16,
+                    color=themes.actual_theme["text_color"],
+                ),
+            ]),
+            padding=16,  # Simplified padding
+        ),
+        content=ft.Container(
+            content=ft.Column(
+                controls=content, 
+                spacing=15,
+                scroll=ft.ScrollMode.AUTO,
+            ),
+            padding=ft.Padding.only(left=16, right=16, bottom=16),
+        ),
+        expanded=expanded,
+        bgcolor=themes.actual_theme["surface"],
+        can_tap_header=True
+    )
+
+
+def card(content=[], color=None):
+    """It creates a card with the main color of the theme and a shadow"""
+    if color is None:
+        color = themes.actual_theme["primary"]
+    return ft.Card(
+        bgcolor=color,
+        content=ft.Container(
+            width=400,
+            padding=15,
+            content=ft.Column(
+                controls=content,
+                spacing=20,
+            ),
+        ),
     )

@@ -10,6 +10,8 @@ if root not in sys.path:
 
 from components.buttons import filled_btn, icon_filled_btn, icon_btn, text_btn, btn
 from components.data_display import (
+    card,
+    expansion_panel,
     icon,
     image,
     progress_bar,
@@ -159,6 +161,58 @@ This is a **markdown** example.
                 await link("https://google.com", page, "Google", size=12),
             ],
         ),
+        (
+            "Expansion Panel",
+            [
+                ft.ExpansionPanelList(
+                    controls=[
+                        expansion_panel(
+                            header="Panel 1 – click to expand",
+                            content=[
+                                body("This is the content inside the first panel."),
+                                caption("A small note beneath the body.", italic=True),
+                            ],
+                            expanded=False,
+                        ),
+                        expansion_panel(
+                            header="Panel 2 – starts expanded",
+                            content=[
+                                body("Content of the second panel."),
+                                error_text("Something went wrong here!"),
+                            ],
+                            expanded=True,
+                        ),
+                    ]
+                )
+            ],
+        ),
+        (
+            "Card",
+            [
+                ft.Row(
+                    [
+                        card(
+                            content=[
+                                title_primary("Primary Card", size=18),
+                                body("A card using the primary theme color."),
+                                filled_btn("Action"),
+                            ]
+                        ),
+                        card(
+                            content=[
+                                title("Custom Color Card", size=18),
+                                body("This card uses a custom background color."),
+                                caption("Optional sub-text."),
+                            ],
+                            color=themes.actual_theme["secondary"],
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    wrap=True,
+                    spacing=20,
+                )
+            ],
+        ),
     ]
 
     content = ft.Column(
@@ -181,7 +235,7 @@ This is a **markdown** example.
                 padding=20,
                 border_radius=10,
                 bgcolor="surfaceVariant",
-                border=ft.border.all(1, "outlineVariant"),
+                border=ft.Border.all(1, "outlineVariant"),
             )
         )
 

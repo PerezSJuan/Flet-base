@@ -1,6 +1,8 @@
 from .buttons import btn, filled_btn, icon_btn, icon_filled_btn, text_btn
 from .data_display import (
+    card,
     datatable,
+    expansion_panel,
     icon,
     image,
     loading_indicator,
@@ -28,7 +30,9 @@ __all__ = [
     "icon_btn",
     "text_btn",
     "btn",
+    "card",
     "datatable",
+    "expansion_panel",
     "icon",
     "image",
     "progress_bar",

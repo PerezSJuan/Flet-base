@@ -164,7 +164,7 @@ async def link(url: str, page: ft.Page, text: str = None, size: int = 12):
     return ft.TextButton(
         content=ft.Text(
             text,
-            color="#0000FF",
+            color=themes.actual_theme["link"],
             style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE),
             size=size,
         ),
