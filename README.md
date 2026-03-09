@@ -311,6 +311,12 @@ A more flexible filled button that allows you to specify custom light and dark m
 
 ```python
 import flet as ft
+
+# ensure parent folder (workspace root) is on import path
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root not in sys.path:
+    sys.path.insert(0, root)
+
 from components.buttons import filled_btn, icon_btn, text_btn
 from themes.themes import instance_themes as themes
 
@@ -321,6 +327,126 @@ async def main(page: ft.Page):
         filled_btn("Submit", on_click=lambda _: print("Submit clicked!")),
         icon_btn(ft.Icons.DELETE, on_click=lambda _: print("Delete clicked!")),
         text_btn("Cancel", on_click=lambda _: page.window_close()),
+    )
+
+ft.app(target=main)
+```
+
+---
+
+# 📝 Components: Texts
+
+The `components/texts.py` module provides a variety of text styles and helpers that seamlessly integrate with your application's theme.
+
+## 🚀 Key Features
+
+* **Theme Consistency**: All text components automatically use the appropriate colors from your theme (e.g., `text_color`, `primary`, `secondary`, `error`).
+* **Semantic Styling**: Pre-defined styles for titles, subtitles, body text, and captions.
+* **Rich Content**: Support for Markdown and clickable links.
+
+---
+
+## 🛠️ API Reference
+
+### Titles & Subtitles
+
+* **`title(text, ...)`**: Main title style using the theme's default text color.
+* **`title_primary(text, ...)`**: Title using the `primary` color.
+* **`title_secondary(text, ...)`**: Title using the `secondary` color.
+* **`subtitle(text, ...)`**: Standard subtitle style.
+* **`subtitle_primary(text, ...)` / `subtitle_secondary(text, ...)`**: Subtitles with theme colors.
+
+### Body & Utilities
+
+* **`body(text, ...)`**: Standard body text.
+* **`caption(text, ...)`**: Small text for descriptions or notes.
+* **`error_text(text, ...)`**: Themed red text for error messages.
+* **`markdown(md, ...)`**: Renders markdown content with theme-aware styling.
+* **`link(url, page, text=None, ...)`**: Creates a clickable `TextButton` that opens a URL.
+
+---
+
+## 🧪 Usage Example
+
+```python
+import flet as ft
+
+# ensure parent folder (workspace root) is on import path
+root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if root not in sys.path:
+    sys.path.insert(0, root)
+
+from components.texts import title, subtitle, body, link
+from themes.themes import instance_themes as themes
+
+async def main(page: ft.Page):
+    await themes.awake(page)
+
+    page.add(
+        title("Welcome to Flet-base"),
+        subtitle("A premium starter kit"),
+        body("This is a standard body text using the theme's colors."),
+        await link("https://flet.dev", page, "Visit Flet Website")
+    )
+
+ft.app(target=main)
+```
+
+---
+
+# 📊 Components: Data Display
+
+The `components/data_display.py` module includes components for presenting data and media, all styled to match your theme.
+
+## 🚀 Key Features
+
+* **Interactive Data**: Simplified `DataTable` integration.
+* **Visual Feedback**: Themed progress bars and loading indicators.
+* **Media Support**: Easy icon and image helpers.
+
+---
+
+## 🛠️ API Reference
+
+### **`datatable(columns, rows, ...)`**
+
+A themed version of `DataTable2` with pre-configured spacing and header colors.
+
+### **`icon(icon, color=None, size=24)`**
+
+Creates an icon that defaults to the theme's `primary` color.
+
+### **`image(src, width=100, height=100, border_radius=5)`**
+
+A simple image helper with a default border radius.
+
+### **`progress_bar(value, ...)`**
+
+A linear progress bar styled with theme colors (`primary` for progress, `surface` for background).
+
+### **`loading_indicator(size=50)`**
+
+A circular progress ring (loading spinner) using the theme's `primary` color.
+
+---
+
+## 🧪 Usage Example
+
+```python
+import flet as ft
+
+
+
+from components.data_display import icon, progress_bar, loading_indicator
+from themes.themes import instance_themes as themes
+
+async def main(page: ft.Page):
+    await themes.awake(page)
+
+    page.add(
+        icon(ft.Icons.FAVORITE),
+        progress_bar(value=0.7),
+        loading_indicator(size=30)
     )
 
 ft.app(target=main)

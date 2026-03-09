@@ -6,6 +6,21 @@ from .data_display import (
     loading_indicator,
     progress_bar,
 )
+from .texts import (
+    body,
+    caption,
+    error_text,
+    link,
+    markdown,
+    subtitle,
+    subtitle_primary,
+    subtitle_secondary,
+    title,
+    title_on_primary,
+    title_on_secondary,
+    title_primary,
+    title_secondary,
+)
 
 __all__ = [
     "filled_btn",
@@ -18,4 +33,17 @@ __all__ = [
     "image",
     "progress_bar",
     "loading_indicator",
+    "body",
+    "caption",
+    "error_text",
+    "link",
+    "markdown",
+    "subtitle",
+    "subtitle_primary",
+    "subtitle_secondary",
+    "title",
+    "title_on_primary",
+    "title_on_secondary",
+    "title_primary",
+    "title_secondary",
 ]
