@@ -16,6 +16,16 @@ from components.data_display import (
     loading_indicator,
     datatable,
 )
+from components.texts import (
+    title,
+    title_primary,
+    subtitle,
+    body,
+    caption,
+    error_text,
+    markdown,
+    link,
+)
 import flet_datatable2 as fdt
 from themes.themes import instance_themes as themes
 
@@ -29,7 +39,7 @@ async def main(page: ft.Page):
 
     async def toggle_theme(e):
         await themes.switch_theme(page)
-        # Limpiamos y volvemos a ejecutar main para refrescar los componentes con los nuevos HEX
+        # Clear and relayout to refresh components with new themed colors
         page.controls.clear()
         await main(page)
 
@@ -89,6 +99,16 @@ async def main(page: ft.Page):
         ),
     ]
 
+    # Markdown content
+    md = """### Markdown Example
+
+This is a **markdown** example.
+
+- Item 1
+- Item 2
+- Item 3
+    """
+
     # Sections
     sections = [
         (
@@ -126,6 +146,19 @@ async def main(page: ft.Page):
             ],
         ),
         ("DataTable", [datatable(columns=columns, rows=rows, width=600, height=300)]),
+        (
+            "Texts",
+            [
+                title("This is a Title"),
+                title_primary("Primary Title"),
+                subtitle("This is a subtitle"),
+                body("This is body text for general content."),
+                caption("This is a caption or a small note.", italic=True),
+                error_text("This is an error message"),
+                markdown(md, size=12),
+                await link("https://google.com", page, "Google", size=12),
+            ],
+        ),
     ]
 
     content = ft.Column(
@@ -134,8 +167,10 @@ async def main(page: ft.Page):
         width=800,
     )
 
-    for title, controls in sections:
-        content.controls.append(ft.Text(title, size=24, weight=ft.FontWeight.BOLD))
+    for section_title, controls in sections:
+        content.controls.append(
+            ft.Text(section_title, size=24, weight=ft.FontWeight.BOLD)
+        )
         content.controls.append(
             ft.Container(
                 content=ft.Column(
