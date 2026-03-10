@@ -9,6 +9,17 @@ if root not in sys.path:
 
 
 from components.buttons import filled_btn, icon_filled_btn, icon_btn, text_btn, btn
+from components.inputs import (
+    switch,
+    text_input,
+    checkbox,
+    color_picker,
+    date_picker,
+    date_range_picker,
+    time_picker,
+    dropdown,
+    slider,
+)
 from components.data_display import (
     card,
     expansion_panel,
@@ -211,6 +222,100 @@ This is a **markdown** example.
                     wrap=True,
                     spacing=20,
                 )
+            ],
+        ),
+        (
+            "Inputs",
+            [
+                # Switch
+                ft.Row(
+                    [
+                        switch("Toggle me", value=True),
+                        switch("Disabled switch", value=False, enabled=False),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Checkbox
+                ft.Row(
+                    [
+                        checkbox("Accept terms", value=True),
+                        checkbox("Disabled checkbox", value=False, enabled=False),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Text inputs
+                ft.Row(
+                    [
+                        text_input("Username", value="JohnDoe"),
+                        text_input("Password", is_password=True),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    wrap=True,
+                    spacing=20,
+                ),
+                # Multiline text input
+                ft.Row(
+                    [
+                        text_input(
+                            "Notes",
+                            value="This is a\nmultiline text input.",
+                            multiline=True,
+                            max_lines=4,
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Dropdown
+                ft.Row(
+                    [
+                        dropdown(
+                            label="Choose a role",
+                            options=[
+                                ft.DropdownOption("developer", text="Developer"),
+                                ft.DropdownOption("designer", text="Designer"),
+                                ft.DropdownOption("manager", text="Manager"),
+                            ],
+                            value="developer",
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Slider
+                ft.Row(
+                    [
+                        slider(
+                            label="Volume: {value}%",
+                            value=60,
+                            min=0,
+                            max=100,
+                            divisions=20,
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Date picker (opened via overlay)
+                ft.Row(
+                    [
+                        filled_btn(
+                            "Pick a Date",
+                            on_click=lambda e: page.show_dialog(date_picker()),
+                        ),
+                        filled_btn(
+                            "Pick a range of dates",
+                            on_click=lambda e: page.show_dialog(date_range_picker()),
+                        ),
+                        filled_btn(
+                            "Pick a Time",
+                            on_click=lambda e: page.show_dialog(time_picker()),
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Color picker
+                ft.Row(
+                    [color_picker(color="#4285F4")],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
             ],
         ),
     ]
