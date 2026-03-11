@@ -12,7 +12,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "flet"
+    "flet",
+    "flet_datatable2",
+    "flet_color_pickers",
 ]
 
 [tool.setuptools]
