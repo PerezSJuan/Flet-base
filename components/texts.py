@@ -1,11 +1,4 @@
-import os
-import sys
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
 
 from themes.themes import instance_themes as themes
 
@@ -154,9 +147,11 @@ def error_text(text: str, size: int = 12, weight=None):
     """Themed red text for error messages."""
     return ft.Text(text, size=size, color=themes.actual_theme["error"], weight=weight)
 
+
 def success_text(text: str, size: int = 12, weight=None):
     """Themed green text for success messages."""
     return ft.Text(text, size=size, color=themes.actual_theme["success"], weight=weight)
+
 
 def warning_text(text: str, size: int = 12, weight=None):
     """Themed yellow text for warning messages."""
@@ -167,8 +162,10 @@ async def link(url: str, page: ft.Page, text: str = None, size: int = 12):
     """Link style text."""
     if text is None:
         text = url
+
     async def on_click(e):
         await page.launch_url(url)
+
     return ft.TextButton(
         content=ft.Text(
             text,

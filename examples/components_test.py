@@ -1,12 +1,4 @@
-import os
-import sys
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
-
 
 from components.buttons import filled_btn, icon_filled_btn, icon_btn, text_btn, btn
 from components.inputs import (

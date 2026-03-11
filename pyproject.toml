@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flet-base"
+version = "0.1.0"
+description = "A premium starter kit for building multi-platform applications with Python and Flet."
+authors = [
+    {name = "PerezSJuan"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "flet"
+]
+
+[tool.setuptools]
+packages = ["components", "themes", "translations"]
+
+[tool.setuptools.package-data]
+translations = ["*.csv"]

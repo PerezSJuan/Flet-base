@@ -1,13 +1,6 @@
-import os
-import sys
 import flet as ft
 import flet_datatable2 as fdt
 
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
 
 from themes.themes import instance_themes as themes
 
@@ -67,18 +60,20 @@ def expansion_panel(header, content=[], expanded=False):
     """It creates an expansion panel with the specified header and content and the main color of the theme"""
     return ft.ExpansionPanel(
         header=ft.Container(
-            content=ft.Row([
-                ft.Text(
-                    header, 
-                    size=16,
-                    color=themes.actual_theme["text_color"],
-                ),
-            ]),
+            content=ft.Row(
+                [
+                    ft.Text(
+                        header,
+                        size=16,
+                        color=themes.actual_theme["text_color"],
+                    ),
+                ]
+            ),
             padding=16,  # Simplified padding
         ),
         content=ft.Container(
             content=ft.Column(
-                controls=content, 
+                controls=content,
                 spacing=15,
                 scroll=ft.ScrollMode.AUTO,
             ),
@@ -86,7 +81,7 @@ def expansion_panel(header, content=[], expanded=False):
         ),
         expanded=expanded,
         bgcolor=themes.actual_theme["surface"],
-        can_tap_header=True
+        can_tap_header=True,
     )
 
 

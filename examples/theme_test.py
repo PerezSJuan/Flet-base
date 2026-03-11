@@ -5,14 +5,7 @@ and dark palettes.  It lives in `examples/` and assumes the workspace root
 is added to `sys.path` so the `themes` package/module can be imported.
 """
 
-import os
-import sys
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
 
 from themes.themes import instance_themes as themes
 

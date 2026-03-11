@@ -34,6 +34,14 @@ custom modules that live here.
 
 Some modules depends to each other, so it is recomended to install all of them even if you do not use it. 
 
+3. **Install as a Package**
+
+   You can install the local modules as an editable package:
+
+   ```bash
+   pip install -e .
+   ```
+
 ---
 
 # 🌍 Translation Manager
@@ -105,13 +113,7 @@ Your `translations.csv` must follow this header structure:
 
 ```python
 import flet as ft
-
-import os
-import sys
 import asyncio
-root = os.path.abspath(os.path.join(os.path.dirname(__file__),"..")
-if root not in sis.path:
-    sys.path.insert(0,root)
 from translations import instance_translation_manager as tm
 
 
@@ -237,15 +239,7 @@ dark_theme = {
 ### 💡 Theme Example
 
 ```python
-import os
-import sys
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
-
 from themes.themes import instance_themes as themes
 
 
@@ -311,12 +305,6 @@ A more flexible filled button that allows you to specify custom light and dark m
 
 ```python
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
-
 from components.buttons import filled_btn, icon_btn, text_btn
 from themes.themes import instance_themes as themes
 
@@ -370,12 +358,6 @@ The `components/texts.py` module provides a variety of text styles and helpers t
 
 ```python
 import flet as ft
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
-
 from components.texts import title, subtitle, body, link
 from themes.themes import instance_themes as themes
 
@@ -453,13 +435,7 @@ A material card with padding and an optional custom background color. Defaults t
 ## 🧪 Usage Example
 
 ```python
-import os, sys
 import flet as ft
-
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
-
 from components.data_display import (
     icon, progress_bar, loading_indicator,
     expansion_panel, card,

@@ -6,16 +6,7 @@ example; instead it relies on the default CSV bundled with the package.  If
 you want to exercise a custom file you may pass its path to the manager.
 """
 
-import os
-import sys
 import asyncio
-
-# ensure parent folder (workspace root) is on import path so
-# the `translations` package can be imported when running this script
-# directly from the examples directory.
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
 
 from translations import instance_translation_manager as tm
 

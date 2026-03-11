@@ -1,14 +1,6 @@
-import os
-import sys
 import datetime
 import flet as ft
-from flet_color_pickers import ColorLabelType, ColorPicker, PaletteType
-
-
-# ensure parent folder (workspace root) is on import path
-root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if root not in sys.path:
-    sys.path.insert(0, root)
+from flet_color_pickers import ColorPicker
 
 from themes.themes import instance_themes as themes
 
@@ -90,7 +82,11 @@ def date_range_picker(
     """It creates a date range picker with the specified label and change
     event handler and the main color of the theme"""
     return ft.DateRangePicker(
-        on_change=on_change, first_date=first_date, last_date=last_date, modal=modal, barrier_color=themes.actual_theme["background"]
+        on_change=on_change,
+        first_date=first_date,
+        last_date=last_date,
+        modal=modal,
+        barrier_color=themes.actual_theme["background"],
     )
 
 
