@@ -498,3 +498,82 @@ async def main(page: ft.Page):
 
 ft.app(target=main)
 ```
+
+---
+
+# ⌨️ Components: Inputs
+
+The `components/inputs.py` module provides a wide range of themed input controls, from basic text fields to complex date and color pickers.
+
+## 🚀 Key Features
+
+* **Theme Integrated**: All inputs use the active theme's `primary` and `background` colors.
+* **Extended Functionality**: Includes built-in helpers for Pickers (Date, Time, Color).
+* **Easy Configuration**: Simplified parameters for common use cases.
+
+---
+
+## 🛠️ API Reference
+
+### Text & Selection
+* **`text_input(placeholder, ...)`**: A customized `TextField` with support for passwords and multiline.
+* **`dropdown(label, options, ...)`**: A themed `Dropdown` menu.
+* **`checkbox(label, ...)`** / **`switch(label, ...)`**: Boolean selection inputs with theme-aware active colors.
+* **`slider(label, ...)`**: A themed range selector.
+
+### Pickers
+* **`color_picker(color="#FFFFFF", ...)`**: A full-featured color selection dialog.
+* **`date_picker(...)`** / **`date_range_picker(...)`**: Themed date selection utilities.
+* **`time_picker(...)`**: A themed clock-style time picker.
+
+---
+
+# 🪟 Components: Modals & Overlays
+
+The `components/modals.py` module provides simplified ways to show `AlertDialogs` and `BottomSheets` with consistent styling and dimensions.
+
+## 🚀 Key Features
+
+* **Consistent Sizing**: Default width of 700px for a premium look on large screens.
+* **Themed Backgrounds**: Automatically uses the theme's `surface` color.
+* **Simplified Actions**: Modal comes with a pre-configured "Close" button using `filled_btn`.
+
+---
+
+## 🛠️ API Reference
+
+### **`modal(title_str, content, on_dismiss=None, width=700, actions=None)`**
+
+Creates an `ft.AlertDialog`. 
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `title_str` | `str` | — | Title text for the modal. |
+| `content` | `list` | — | List of controls to show in the body. |
+| `width` | `int` | `700` | Width of the internal container. |
+| `actions` | `list` | `[Close Button]` | List of buttons at the bottom. |
+
+### **`bottom_sheet(content, width=700)`**
+
+Creates an `ft.BottomSheet` anchored to the bottom of the page.
+
+---
+
+## 🧪 Usage Example
+
+```python
+from components.modals import modal, bottom_sheet
+from components.texts import body
+
+# To show a Modal
+page.show_dialog(
+    modal(
+        "Confirmation",
+        [body("Are you sure you want to proceed?")]
+    )
+)
+
+# To close a Modal or Bottom Sheet
+page.pop_dialog()
+```
+

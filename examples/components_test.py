@@ -36,9 +36,12 @@ from components.texts import (
     body,
     caption,
     error_text,
+    success_text,
+    warning_text,
     markdown,
     link,
 )
+from components.modals import modal, bottom_sheet
 import flet_datatable2 as fdt
 from themes.themes import instance_themes as themes
 
@@ -168,6 +171,8 @@ This is a **markdown** example.
                 body("This is body text for general content."),
                 caption("This is a caption or a small note.", italic=True),
                 error_text("This is an error message"),
+                success_text("This is a success message"),
+                warning_text("This is a warning message"),
                 markdown(md, size=12),
                 await link("https://google.com", page, "Google", size=12),
             ],
@@ -298,15 +303,15 @@ This is a **markdown** example.
                     [
                         filled_btn(
                             "Pick a Date",
-                            on_click=lambda e: page.show_dialog(date_picker()),
+                            on_click=lambda e: page.open(date_picker()),
                         ),
                         filled_btn(
                             "Pick a range of dates",
-                            on_click=lambda e: page.show_dialog(date_range_picker()),
+                            on_click=lambda e: page.open(date_range_picker()),
                         ),
                         filled_btn(
                             "Pick a Time",
-                            on_click=lambda e: page.show_dialog(time_picker()),
+                            on_click=lambda e: page.open(time_picker()),
                         ),
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
@@ -316,6 +321,41 @@ This is a **markdown** example.
                     [color_picker(color="#4285F4")],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),
+            ],
+        ),
+        (
+            "Modals",
+            [
+                ft.Row(
+                    [
+                        filled_btn(
+                            "Open Modal",
+                            on_click=lambda e: page.show_dialog(
+                                modal(
+                                    "Test Modal",
+                                    [body("This is a modal content.")],
+                                )
+                            ),
+                        ),
+                        filled_btn(
+                            "Open Bottom Sheet",
+                            on_click=lambda e: page.show_dialog(
+                                bottom_sheet(
+                                    [
+                                        title("Bottom Sheet"),
+                                        body("This is a bottom sheet content."),
+                                        filled_btn(
+                                            "Close",
+                                            on_click=lambda _: page.pop_dialog(),
+                                        ),
+                                    ]
+                                )
+                            ),
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=20,
+                )
             ],
         ),
     ]
