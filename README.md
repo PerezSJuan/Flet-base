@@ -553,3 +553,152 @@ page.show_dialog(
 page.pop_dialog()
 ```
 
+---
+
+# 🛣️ Flet Router Manager
+
+The `router` module provides a powerful, decorator-based routing system for Flet applications. It supports dynamic route matching, query string parsing, global/route-specific middlewares, UI shells (layouts), and custom 404 handling.
+
+## 🚀 Key Features
+
+* **Express/FastAPI Style**: Use `@app.page("/route")` to define views.
+* **Dynamic routes & Query Strings**: Easily capture parameters like `/user/:id` and `?mode=edit`.
+* **Middlewares**: Intercept navigation globally or per-route for authentication, logging, etc.
+* **Shells (Layouts)**: Wrap pages in common UI elements (AppBars, NavigationBars) based on path prefixes.
+* **Shared State**: Pass data safely between routes using a built-in `shared` dictionary.
+* **Navigation History**: Go back easily using built-in history tracking.
+
+---
+
+## 🛠️ Initialization & Setup
+
+To use the router, instantiate `FletRouter` and pass it to `app.run()`. This replaces the standard `ft.app(target=main)` call.
+
+```python
+import flet as ft
+from router import FletRouter, DataSystem
+
+app = FletRouter(
+    route_init="/login",  # Starting route
+    route_login="/login",  # Auto-redirect for protected routes
+)
+
+# ... define pages ...
+
+if __name__ == "__main__":
+    app.run() # Starts the Flet app automatically
+```
+
+---
+
+## 📄 Defining Pages
+
+Use the `@app.page` decorator. The function must accept a `DataSystem` object and return an `ft.View`.
+
+```python
+@app.page("/home", title="Main Menu", protected=True)
+def home_page(data: DataSystem) -> ft.View:
+    return ft.View(
+        route="/home",
+        controls=[
+            ft.Text("Welcome to the Home Page!"),
+            ft.ElevatedButton("Go to Settings", on_click=data.go("/settings"))
+        ]
+    )
+```
+
+- `title`: Automatically sets the page title.
+- `protected`: If `True`, the router checks if the user is authenticated (using `data.shared["authenticated"]`). If not, redirects to `route_login`.
+
+### Dynamic Routes & Query Parameters
+You can define dynamic segments using `:param_name`:
+
+```python
+@app.page("/user/:id")
+def user_profile(data: DataSystem) -> ft.View:
+    user_id = data.param("id") # Extracts from URL e.g. /user/42 -> 42
+    mode = data.query("mode", "view") # Extracts ?mode=edit
+    
+    return ft.View(
+        route=f"/user/{user_id}",
+        controls=[ft.Text(f"Profile {user_id} - Mode: {mode}")]
+    )
+```
+
+---
+
+## 🛡️ Middlewares
+
+Middlewares allow you to execute logic before a page loads. They return a `MiddlewareResult` to either proceed (`next`), redirect (`redirect`), or show a custom view (`view`).
+
+### Global Middleware
+
+Applies to every navigation. Useful for logging or global auth guards:
+
+```python
+from router import MiddlewareResult
+
+@app.middleware
+def log_navigation(data: DataSystem):
+    print(f"Navigating to {data.page.route}")
+    return MiddlewareResult.next()
+```
+
+### Route-specific Middleware
+
+You can attach specific middlewares to single pages:
+
+```python
+def check_admin(data: DataSystem):
+    if not data.shared.get("is_admin"):
+        return MiddlewareResult.redirect("/home")
+    return MiddlewareResult.next()
+
+@app.page("/admin", middlewares=[check_admin])
+def admin_dashboard(data: DataSystem) -> ft.View:
+    # ...
+```
+
+---
+
+## 🐚 Shells (Layouts)
+
+Shells allow you to wrap the returned `ft.View` in common UI containers, like adding an `AppBar` or `NavigationBar`.
+
+```python
+@app.shell(exclude=["/login"])
+def global_appbar(data: DataSystem, view: ft.View) -> ft.View:
+    # Adds an AppBar to all views EXCEPT /login
+    view.appbar = ft.AppBar(title=ft.Text("My App"))
+    return view
+
+@app.shell(prefix="/admin")
+def admin_sidebar(data: DataSystem, view: ft.View) -> ft.View:
+    # Prepends a custom Navigation block to any route starting with /admin
+    view.controls.insert(0, ft.Text("Admin Area Menu"))
+    return view
+```
+
+---
+
+## 🔄 Navigation & Data Sharing
+
+The `DataSystem` instance (`data`) injected into every function is your gateway to controlling the app.
+
+- **`data.go(route)`**: Returns an event handler (lambda) to navigate to a new route. Beautiful for buttons: `on_click=data.go('/home')`
+- **`data.page.go(route)`**: Navigates immediately in code.
+- **`data.go_back()`**: Navigates to the previous route in history.
+- **`data.shared`**: A persistent dictionary to safely store state across pages.
+  - Setup session: `data.shared["user"] = "john_doe"`
+  - Verify admin status: `data.shared["is_admin"] = True`
+  - Get data: `data.shared.get("user")`
+
+### Custom 404 Page
+
+Create a custom page for unmatched routes:
+
+```python
+@app.page_404
+def build_404(data: DataSystem) -> ft.View:
+    return ft.View(route="/404", controls=[ft.Text("Page not found!")])
+```
