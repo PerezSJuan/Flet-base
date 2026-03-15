@@ -555,6 +555,68 @@ page.pop_dialog()
 
 ---
 
+# 📐 Layout: Responsive Auto Layout
+
+The `layout/responsive_auto_layout.py` module provides a specialized layout component that automatically arranges its children into rows based on available width, applying precise scaling when content exceeds the boundaries.
+
+## 🚀 Key Features
+
+* **Real-time Measurement**: Attempts to measure actual rendered widths using `on_resize` events for high accuracy.
+* **Intelligent Grouping**: Groups elements into rows dynamically using a greedy algorithm.
+* **Proportional Scaling**: If a group doesn't fit, it scales the entire group (width and height) down to fit the available space exactly.
+* **Threshold Mode**: Forces a single-column layout when the page width drops below a customizable `threshold`.
+* **Centered Alignment**: Keeps all rows horizontally and vertically centered within the layout container.
+
+---
+
+## 🛠️ API Reference
+
+### **`ResponsiveAutoLayout(content, page, spacing=10, threshold=600)`**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `content` | `list[ft.Control]` | — | The list of controls to be managed by the layout. |
+| `page` | `ft.Page` | — | The active Flet page (required for resize events and padding calculation). |
+| `spacing` | `int` | `10` | Horizontal and vertical gap between elements. |
+| `threshold` | `int` | `600` | Width in pixels below which the layout forces a single column. |
+
+### **`control` (Property)**
+Returns the root Flet control (a `Container`) that should be added to your page or parent container.
+
+---
+
+## 🧪 Usage Example
+
+```python
+import flet as ft
+from layout.responsive_auto_layout import ResponsiveAutoLayout
+
+def main(page: ft.Page):
+    page.padding = 20
+    
+    # Create several cards with different widths
+    cards = [
+        ft.Container(width=200, height=150, bgcolor="amber", content=ft.Text("Card 1")),
+        ft.Container(width=400, height=150, bgcolor="blue", content=ft.Text("Card 2")),
+        ft.Container(width=150, height=150, bgcolor="green", content=ft.Text("Card 3")),
+    ]
+
+    # Initialize the layout
+    ral = ResponsiveAutoLayout(
+        content=cards,
+        page=page,
+        spacing=15,
+        threshold=500
+    )
+
+    # Add it to the page
+    page.add(ral.control)
+
+ft.app(target=main)
+```
+
+---
+
 # 🛣️ Flet Router Manager
 
 The `router` module provides a powerful, decorator-based routing system for Flet applications. It supports dynamic route matching, query string parsing, global/route-specific middlewares, UI shells (layouts), and custom 404 handling.

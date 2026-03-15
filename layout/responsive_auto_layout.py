@@ -5,47 +5,47 @@ import flet as ft
 
 class ResponsiveAutoLayout:
     """
-    Layout responsivo que mide el ancho natural de cada control y los agrupa
-    en filas según el ancho disponible de pantalla, escalándolos si es necesario.
+    Responsive layout that measures the natural width of each control and groups them
+    into rows based on the available screen width, scaling them if necessary.
 
-    Flujo:
-      1. Medición: intenta capturar el ancho real via Container.on_resize (Flet
-         reciente). Si no está disponible, lee el atributo .width del control.
-      2. Agrupación: pasa los anchos a `_procesar_anchuras`, que decide qué
-         controles van juntos en la misma fila y con qué escala.
-      3. Renderizado: construye una fila por cada grupo, centrada horizontal y
-         verticalmente. Si el contenido desborda, aparece scroll automático.
+    Workflow:
+      1. Measurement: attempts to capture the real width via Container.on_resize (recent Flet).
+         If not available, it reads the .width attribute of the control.
+      2. Grouping: passes the widths to `_process_widths`, which decides which
+         controls go together in the same row and with what scale.
+      3. Rendering: builds one row per group, horizontally and vertically centered.
+         If content overflows, automatic scroll appears.
 
-    Atributos públicos:
-        threshold (int): por debajo de este ancho de página el layout pasa a
-                         columna única. Modificable en tiempo de ejecución.
+    Public Attributes:
+        threshold (int): below this page width, the layout switches to a single column.
+                         Modifiable at runtime.
 
-    Uso mínimo:
+    Minimum usage:
         layout = ResponsiveAutoLayout(content=cards, page=page)
         page.add(layout.control)
     """
 
-    # Ancho de fallback cuando no se puede medir ni leer el control
+    # Fallback width when the control cannot be measured or its width read
     _FALLBACK_WIDTH = 200.0
 
     def __init__(
         self,
         content: Union[list[ft.Control], ft.Control],
         page: ft.Page,
-        separacion: int = 10,
+        spacing: int = 10,
         threshold: int = 600,
     ):
         self._children = content if isinstance(content, list) else [content]
         self._page = page
-        self._separacion = separacion
-        self.threshold = threshold  # público: accesible y modificable desde fuera
+        self._spacing = spacing
+        self.threshold = threshold  # public: accessible and modifiable from outside
 
-        # Anchos reales medidos en fase 1; None mientras no se hayan capturado
+        # Real widths measured in phase 1; None while not yet captured
         self._widths: list[float | None] = [None] * len(self._children)
 
-        # Columna interna: tight=True para que ocupe solo lo necesario.
+        # Internal column: tight=True so it only occupies what's necessary.
         self._inner = ft.Column(
-            spacing=separacion,
+            spacing=spacing,
             tight=True,
             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         )
@@ -55,27 +55,27 @@ class ResponsiveAutoLayout:
             alignment=ft.Alignment.CENTER,
         )
 
-        # Activar scroll en la página directamente: es el único mecanismo
-        # fiable en Flet para scroll con rueda de ratón.
+        # Enable scroll on the page directly: it's the only reliable mechanism
+        # in Flet for mouse wheel scrolling.
         page.scroll = ft.ScrollMode.AUTO
 
         self._start_measurement()
         page.on_resize = self._on_resize
 
-    # ── API pública ──────────────────────────────────────────────────────────
+    # ── Public API ──────────────────────────────────────────────────────────
 
     @property
     def control(self) -> ft.Container:
-        """Control raíz que se añade a la página."""
+        """Root control to be added to the page."""
         return self._root
 
-    # ── Fase 1: medición de anchos reales ────────────────────────────────────
+    # ── Phase 1: Real width measurement ────────────────────────────────────
 
     def _read_width_from_control(self, child: ft.Control) -> float | None:
         """
-        Lee el ancho declarado de un control sin necesidad de renderizarlo.
-        Busca en el control mismo y, si es un Container, en su contenido.
-        Devuelve None si no encuentra ningún valor válido.
+        Reads the declared width of a control without needing to render it.
+        Looks in the control itself and, if it's a Container, in its content.
+        Returns None if no valid value is found.
         """
         for node in (child, getattr(child, "content", None)):
             if node is None:
@@ -87,17 +87,17 @@ class ResponsiveAutoLayout:
 
     def _start_measurement(self) -> None:
         """
-        Intenta medir el ancho real de cada control via Container.on_resize,
-        disponible en versiones recientes de Flet.
+        Attempts to measure the real width of each control via Container.on_resize,
+        available in recent versions of Flet.
 
-        Si on_resize no está soportado (TypeError), cae a leer el atributo
-        .width del control directamente. Si tampoco lo tiene, usa _FALLBACK_WIDTH.
+        If on_resize is not supported (TypeError), it falls back to reading the
+        .width attribute of the control directly. If it doesn't have it either, it uses _FALLBACK_WIDTH.
 
-        En el caso de medición real, los controles se renderizan invisibles
-        (opacity=0) y el layout se construye cuando todos están medidos.
-        En el caso de fallback, el layout se construye de inmediato.
+        In the case of real measurement, controls are rendered invisible
+        (opacity=0) and the layout is built when all are measured.
+        In the fallback case, the layout is built immediately.
         """
-        print("\n── Medición de controles ───────────────────────────────")
+        print("\n── Measuring Controls ───────────────────────────────")
         wrappers = []
         fallback_needed = False
 
@@ -105,28 +105,28 @@ class ResponsiveAutoLayout:
             expected = self._read_width_from_control(child)
 
             def on_measured(e: ft.ControlEvent, idx: int = i, exp=expected) -> None:
-                # Solo registrar la primera medición válida de cada control
+                # Only register the first valid measurement of each control
                 if e.width and e.width > 0 and self._widths[idx] is None:
                     self._widths[idx] = e.width
-                    # Debug: real width vs expected (width declarado en el control)
+                    # Debug: real width vs expected (width declared in the control)
                     real = int(e.width)
                     if exp is not None:
-                        desv = real - int(exp)
-                        status = "OK" if abs(desv) <= 1 else f"DESVIACIÓN: {desv:+d}px"
+                        deviation = real - int(exp)
+                        status = "OK" if abs(deviation) <= 1 else f"DEVIATION: {deviation:+d}px"
                         print(f"  [control #{idx}] real: {real}px  expected: {int(exp)}px  → {status}")
                     else:
-                        print(f"  [control #{idx}] real: {real}px  expected: N/A (sin .width declarado)")
-                    # Cuando todos los controles están medidos, construir el layout
+                        print(f"  [control #{idx}] real: {real}px  expected: N/A (no declared .width)")
+                    # When all controls are measured, build the layout
                     if all(w is not None for w in self._widths):
                         self._build_layout()
                         self._page.update()
 
             try:
-                # El Container de medición va dentro de un ft.Row(tight=True)
-                # para que no se estire al ancho de la Column padre, sino que
-                # adopte el tamaño natural del control hijo. Sin este Row,
-                # e.width devolvería el ancho disponible completo, no el de
-                # la card, haciendo que todas las mediciones sean incorrectas.
+                # The measurement Container goes inside a ft.Row(tight=True)
+                # so it doesn't stretch to the parent Column width, but instead
+                # adopts the natural size of the child control. Without this Row,
+                # e.width would return the full available width, not the card's,
+                # making all measurements incorrect.
                 wrapper = ft.Row(
                     controls=[
                         ft.Container(
@@ -135,35 +135,35 @@ class ResponsiveAutoLayout:
                             opacity=0.0,
                         )
                     ],
-                    tight=True,  # la Row solo ocupa lo que necesita su hijo
+                    tight=True,  # the Row only occupies what its child needs
                 )
                 wrappers.append(wrapper)
             except TypeError:
-                # on_resize no disponible en esta versión de Flet:
-                # leer .width declarado del control directamente
+                # on_resize not available in this Flet version:
+                # read declared .width from the control directly
                 fallback_needed = True
                 w = self._read_width_from_control(child)
                 measured = w if w is not None else self._FALLBACK_WIDTH
                 self._widths[i] = measured
-                # Debug: real width vs expected (en este modo "real" = declarado)
+                # Debug: real width vs expected (in this mode "real" = declared)
                 if w is not None:
-                    print(f"  [control #{i}] real: {int(measured)}px  expected: {int(measured)}px  → OK (leído de .width)")
+                    print(f"  [control #{i}] real: {int(measured)}px  expected: {int(measured)}px  → OK (read from .width)")
                 else:
-                    print(f"  [control #{i}] real: N/A  expected: N/A  → FALLBACK {self._FALLBACK_WIDTH}px (sin .width declarado)")
+                    print(f"  [control #{i}] real: N/A  expected: N/A  → FALLBACK {self._FALLBACK_WIDTH}px (no declared .width)")
                 wrappers.append(child)
 
         self._inner.controls = wrappers
 
-        # Si todos los anchos ya están disponibles (modo fallback), construir ya
+        # If all widths are already available (fallback mode), build now
         if fallback_needed and all(w is not None for w in self._widths):
             self._build_layout()
 
-    # ── Fase 2: construcción del layout ──────────────────────────────────────
+    # ── Phase 2: Layout construction ──────────────────────────────────────
 
     def _compute_available_width(self) -> float:
         """
-        Ancho disponible = ancho de página menos padding horizontal.
-        Soporta tanto padding numérico como objeto ft.Padding.
+        Available width = page width minus horizontal padding.
+        Supports both numeric padding and ft.Padding object.
         """
         p = self._page
         pad = p.padding
@@ -178,32 +178,32 @@ class ResponsiveAutoLayout:
 
     def _build_layout(self) -> None:
         """
-        Construye el layout completo a partir de los anchos medidos.
-        Delega la lógica de agrupación y escala a _procesar_anchuras,
-        luego convierte cada grupo en una fila centrada.
+        Builds the full layout based on measured widths.
+        Delegates grouping and scaling logic to _process_widths,
+        then converts each group into a centered row.
 
-        Cada fila ocupa el ancho completo disponible (expand=True) para que
-        el centrado sea consistente independientemente del tamaño del contenido.
+        Each row occupies the full available width (expand=True) so that
+        centering is consistent regardless of content size.
 
-        Si el ancho de página está por debajo de threshold, fuerza una
-        sola columna pasando cada control individualmente sin agrupar.
+        If page width is below threshold, it forces a single column by
+        passing each control individually without grouping.
         """
         available = self._compute_available_width()
         width = self._page.width or 0
 
         if width < self.threshold:
-            # Modo columna única: cada control ocupa su propia fila sin escala
+            # Single column mode: each control occupies its own row without scaling
             result = {i: 1.0 for i in range(len(self._children))}
         else:
-            elementos = {i: int(self._widths[i]) for i in range(len(self._children))}
-            result = self._procesar_anchuras(elementos, int(available), self._separacion)
+            elements = {i: int(self._widths[i]) for i in range(len(self._children))}
+            result = self._process_widths(elements, int(available), self._spacing)
 
         print(
             f"ResponsiveAutoLayout → width={int(width)}px "
-            f"available={int(available)}px filas={len(result)}"
+            f"available={int(available)}px rows={len(result)}"
         )
         print(f"  widths: {[int(w) for w in self._widths]}")
-        print(f"  grupos: {list(result.keys())}")
+        print(f"  groups: {list(result.keys())}")
 
         rows = []
         for key, scale in result.items():
@@ -220,15 +220,15 @@ class ResponsiveAutoLayout:
 
     def _make_scaled_widget(self, keys: tuple, scale: float) -> ft.Control:
         """
-        Construye el widget visual para un grupo de controles.
+        Builds the visual widget for a group of controls.
 
-        - Si scale == 1.0: devuelve los controles directamente (sin transformación).
-        - Si scale < 1.0: el grupo supera el ancho disponible y hay que reducirlo.
-          ft.Scale y ft.Stack no modifican el espacio en el layout de Flet, así
-          que la única solución fiable es modificar width/height directamente en
-          cada control del grupo proporcialmente a la escala calculada.
+        - If scale == 1.0: returns the controls directly (no transformation).
+        - If scale < 1.0: the group exceeds available width and needs reduction.
+          ft.Scale and ft.Stack do not modify space in Flet's layout, so the only
+          reliable solution is to modify width/height directly in each control
+          of the group proportionally to the calculated scale.
 
-        Cuando hay varios controles en el grupo, se envuelven en una Row centrada.
+        When there are multiple controls in a group, they are wrapped in a centered Row.
         """
         children = [self._children[k] for k in keys]
 
@@ -236,7 +236,7 @@ class ResponsiveAutoLayout:
             inner: ft.Control = (
                 ft.Row(
                     controls=children,
-                    spacing=self._separacion,
+                    spacing=self._spacing,
                     alignment=ft.MainAxisAlignment.CENTER,
                 )
                 if len(children) > 1
@@ -244,10 +244,10 @@ class ResponsiveAutoLayout:
             )
             return inner
 
-        # Escalar directamente width y height de cada control del grupo.
-        # Es el único mecanismo que Flet respeta en el layout.
-        # Se modifica una copia de los atributos, no el control original,
-        # envolviéndolo en un Container con las dimensiones escaladas.
+        # Directly scale width and height of each control in the group.
+        # It's the only mechanism Flet respects in the layout.
+        # A copy of the attributes is modified, not the original control,
+        # wrapping it in a Container with scaled dimensions.
         scaled_children = []
         for child in children:
             w = getattr(child, "width", None)
@@ -264,7 +264,7 @@ class ResponsiveAutoLayout:
         return (
             ft.Row(
                 controls=scaled_children,
-                spacing=self._separacion * scale,
+                spacing=self._spacing * scale,
                 alignment=ft.MainAxisAlignment.CENTER,
             )
             if len(scaled_children) > 1
@@ -274,86 +274,86 @@ class ResponsiveAutoLayout:
     # ── Resize ───────────────────────────────────────────────────────────────
 
     def _on_resize(self, e: ft.ControlEvent) -> None:
-        """Recalcula el layout en cada cambio de tamaño de ventana."""
+        """Recalculates setup on every window resize."""
         if all(w is not None for w in self._widths):
             self._build_layout()
             self._page.update()
 
-    # ── Algoritmo de agrupación y escala ─────────────────────────────────────
+    # ── Grouping and scaling algorithm ─────────────────────────────────────
 
     @staticmethod
-    def _procesar_anchuras(
-        elementos: dict,
-        ancho_pantalla: int,
-        separacion: int = 0,
+    def _process_widths(
+        elements: dict,
+        screen_width: int,
+        spacing: int = 0,
     ) -> dict:
         """
-        Procesa un diccionario de elementos con sus anchos y devuelve un nuevo
-        diccionario con las escalas necesarias para ajustarlos a la pantalla.
+        Processes a dictionary of elements with their widths and returns a new
+        dictionary with the necessary scales to fit them onto the screen.
 
-        Parámetros:
-        - elementos:      dict {clave: ancho} donde clave puede ser cualquier tipo
-                          hashable y ancho es un int positivo.
-        - ancho_pantalla: int, ancho de la pantalla de referencia.
-        - separacion:     int, espacio fijo entre elementos agrupados (por defecto 0).
+        Parameters:
+        - elements:      dict {key: width} where key can be any hashable type
+                         and width is a positive int.
+        - screen_width:  int, reference screen width.
+        - spacing:       int, fixed space between grouped elements (default 0).
 
-        Retorna:
-        - dict {clave_o_grupo: escala} donde:
-            · clave_o_grupo es la clave original si el elemento va solo,
-              o una tupla con las claves si se agruparon varios.
-            · escala es un float que indica el factor de escala aplicado.
+        Returns:
+        - dict {key_or_group: scale} where:
+            · key_or_group is the original key if the element is alone,
+              or a tuple of keys if multiple were grouped.
+            · scale is a float indicating the applied scale factor.
 
-        Lógica (greedy hasta ancho disponible):
-        - Por cada elemento, se intenta añadir el siguiente mientras el grupo
-          resultante no supere el ancho disponible completo.
-        - Si un elemento individual es más ancho que el disponible, se escala
-          hacia abajo exactamente hasta caber.
-        - Si cabe sin superar el límite: escala 1.0 (sin cambios).
-        - Se maximiza el número de elementos por fila sin escalar.
+        Logic (greedy until available width):
+        - For each element, attempts to add the next as long as the resulting group
+          does not exceed the full available width.
+        - If an individual element is wider than available, it is scaled down
+          exactly to fit.
+        - If it fits without exceeding the limit: scale 1.0 (no change).
+        - Maximizes the number of elements per row without scaling.
         """
-        # Filtrar elementos con ancho 0 (inválidos)
-        elementos_validos = []
-        for clave, ancho in elementos.items():
-            if ancho == 0:
-                print(f"Error: el elemento '{clave}' tiene ancho 0 y será ignorado.")
+        # Filter elements with width 0 (invalid)
+        valid_elements = []
+        for key, width in elements.items():
+            if width == 0:
+                print(f"Error: element '{key}' has width 0 and will be ignored.")
             else:
-                elementos_validos.append((clave, ancho))
+                valid_elements.append((key, width))
 
-        if not elementos_validos:
+        if not valid_elements:
             return {}
 
-        resultado = {}
+        result = {}
         i = 0
-        n = len(elementos_validos)
-        # Usar el ancho disponible completo como límite de agrupación.
-        # Un margen del 90% era frágil: 2px de diferencia podían impedir
-        # que un grupo de 3 cards cupiera cuando sí cabía visualmente.
-        limite = ancho_pantalla
+        n = len(valid_elements)
+        # Use full available width as grouping limit.
+        # A 90% margin was fragile: 2px difference could prevent a group
+        # of 3 cards from fitting when they visually could.
+        limit = screen_width
 
         while i < n:
-            clave_actual, ancho_actual = elementos_validos[i]
-            grupo = [clave_actual]
-            ancho_grupo = ancho_actual
+            current_key, current_width = valid_elements[i]
+            group = [current_key]
+            group_width = current_width
 
-            # Seguir añadiendo elementos mientras el grupo quepa en el ancho disponible
+            # Keep adding elements as long as the group fits in the available width
             while i + 1 < n:
-                sig_clave, sig_ancho = elementos_validos[i + 1]
-                if ancho_grupo + sig_ancho + separacion <= limite:
+                next_key, next_width = valid_elements[i + 1]
+                if group_width + next_width + spacing <= limit:
                     i += 1
-                    ancho_grupo += sig_ancho + separacion
-                    grupo.append(sig_clave)
+                    group_width += next_width + spacing
+                    group.append(next_key)
                 else:
                     break
 
-            # Si un elemento individual supera el ancho disponible, escalarlo
-            escala = limite / ancho_grupo if ancho_grupo > limite else 1.0
+            # If an individual element exceeds available width, scale it
+            scale = limit / group_width if group_width > limit else 1.0
 
-            # Clave simple si el grupo tiene un solo elemento, tupla si son varios
-            if len(grupo) == 1:
-                resultado[grupo[0]] = escala
+            # Simple key if the group has one element, tuple if multiple
+            if len(group) == 1:
+                result[group[0]] = scale
             else:
-                resultado[tuple(grupo)] = escala
+                result[tuple(group)] = scale
 
-            i += 1  # avanzar al siguiente grupo
+            i += 1  # advance to next group
 
-        return resultado
+        return result
