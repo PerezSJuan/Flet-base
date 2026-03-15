@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["components", "themes", "translations", "router"]
+packages = ["components", "themes", "translations", "router", "layout"]
 
 [tool.setuptools.package-data]
 translations = ["*.csv"]
