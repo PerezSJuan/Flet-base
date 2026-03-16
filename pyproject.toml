@@ -18,7 +18,8 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["components", "themes", "translations", "router", "layout"]
+packages = ["flet_base", "flet_base.components", "flet_base.layout", "flet_base.router", "flet_base.themes", "flet_base.translations"]
+
 
 [tool.setuptools.package-data]
 translations = ["*.csv"]

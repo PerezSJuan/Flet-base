@@ -1,9 +1,9 @@
 import flet as ft
 
 
-from components.texts import title
-from components.buttons import filled_btn
-from themes.themes import instance_themes as themes
+from flet_base.components.texts import title
+from flet_base.components.buttons import filled_btn
+from flet_base.themes.themes import instance_themes as themes
 
 
 def bottom_sheet(content, width=700):

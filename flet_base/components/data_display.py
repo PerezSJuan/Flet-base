@@ -2,7 +2,7 @@ import flet as ft
 import flet_datatable2 as fdt
 
 
-from themes.themes import instance_themes as themes
+from flet_base.themes.themes import instance_themes as themes
 
 
 def datatable(

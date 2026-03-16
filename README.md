@@ -20,27 +20,29 @@ custom modules that live here.
    This will generate a minimal Flet project structure (including an
    `app.py` or similar entry point) and install the core `flet` package.
 
-2. **Install local utility modules**
+2. **Flet-base Package Structure & Global Config**
    
-   * `components`
+   All utility modules (`components`, `layout`, `router`, `themes`, `translations`) are now neatly packed under the `flet_base` package namespace to prevent import conflicts and make publishing to PyPI straightforward.
    
-   * `layout`
+   Before starting the app, you can easily configure defaults using the global `config.py` object:
    
-   * `router`
+   ```python
+   from flet_base.config import flet_config
    
-   * `themes`
-   
-   * `translations`
-
-Some modules depends to each other, so it is recomended to install all of them even if you do not use it. 
+   flet_config.default_language = "es"
+   flet_config.default_theme_mode = "dark"
+   # etc...
+   ```
 
 3. **Install as a Package**
-
+   
    You can install the local modules as an editable package:
-
+   
    ```bash
    pip install -e .
    ```
+
+It is also available in pip. 
 
 ---
 
@@ -66,8 +68,8 @@ A robust and simple utility to manage multi-language support in **Flet** applica
 
 Creates a new manager instance.
 
-- **`csv_path`**: Optional. Path to your translation file. Defaults to `translations.csv` in the same directory as the module.
-- **`default_lang`**: The fallback language code.
+- **`csv_path`**: Optional. Path to your translation file. If omitted, the manager uses `flet_config.translations_csv_path`. If neither is configured, the manager will start empty safely and log a warning to the console.
+- **`default_lang`**: Optional. Override the `flet_config.default_language` fallback.
 
 #### **`awake(page: ft.Page)`**
 
@@ -113,8 +115,12 @@ Your `translations.csv` must follow this header structure:
 
 ```python
 import flet as ft
-import asyncio
-from translations import instance_translation_manager as tm
+from flet_base.config import flet_config
+
+# 0. Point to your CSV file before taking translations
+flet_config.translations_csv_path = "assets/translations.csv"
+
+from flet_base.translations import instance_translation_manager as tm
 
 
 async def main(page: ft.Page):
@@ -149,7 +155,7 @@ ft.app(target=main)
 The `translations.py` file includes a built-in test block. You can run it directly to verify your CSV loading:
 
 ```bash
-python translations/translations.py
+python flet_base/translations/translations.py
 ```
 
 ---
@@ -240,7 +246,7 @@ dark_theme = {
 
 ```python
 import flet as ft
-from themes.themes import instance_themes as themes
+from flet_base.themes import instance_themes as themes
 
 
 def main(page: ft.Page):
@@ -305,8 +311,8 @@ A more flexible filled button that allows you to specify custom light and dark m
 
 ```python
 import flet as ft
-from components.buttons import filled_btn, icon_btn, text_btn
-from themes.themes import instance_themes as themes
+from flet_base.components.buttons import filled_btn, icon_btn, text_btn
+from flet_base.themes import instance_themes as themes
 
 async def main(page: ft.Page):
     await themes.awake(page)
@@ -358,8 +364,8 @@ The `components/texts.py` module provides a variety of text styles and helpers t
 
 ```python
 import flet as ft
-from components.texts import title, subtitle, body, link
-from themes.themes import instance_themes as themes
+from flet_base.components.texts import title, subtitle, body, link
+from flet_base.themes import instance_themes as themes
 
 async def main(page: ft.Page):
     await themes.awake(page)
@@ -415,20 +421,20 @@ A circular progress ring (loading spinner) using the theme's `primary` color.
 
 A collapsible panel with a `surface`-themed background. Wrap one or more inside a `ft.ExpansionPanelList` to allow only one open at a time.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `header` | `str` | — | Label shown in the collapsed header bar. |
-| `content` | `list` | `[]` | Flet controls rendered inside the expanded body. |
-| `expanded` | `bool` | `False` | Whether the panel starts already open. |
+| Parameter  | Type   | Default | Description                                      |
+| ---------- | ------ | ------- | ------------------------------------------------ |
+| `header`   | `str`  | —       | Label shown in the collapsed header bar.         |
+| `content`  | `list` | `[]`    | Flet controls rendered inside the expanded body. |
+| `expanded` | `bool` | `False` | Whether the panel starts already open.           |
 
 ### **`card(content=[], color=None)`**
 
 A material card with padding and an optional custom background color. Defaults to the theme's `primary` color.
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `content` | `list` | `[]` | Flet controls placed inside the card body. |
-| `color` | `str \| None` | `None` | Card background. Falls back to `primary` if omitted. |
+| Parameter | Type          | Default | Description                                          |
+| --------- | ------------- | ------- | ---------------------------------------------------- |
+| `content` | `list`        | `[]`    | Flet controls placed inside the card body.           |
+| `color`   | `str \| None` | `None`  | Card background. Falls back to `primary` if omitted. |
 
 ---
 
@@ -436,12 +442,12 @@ A material card with padding and an optional custom background color. Defaults t
 
 ```python
 import flet as ft
-from components.data_display import (
+from flet_base.components.data_display import (
     icon, progress_bar, loading_indicator,
     expansion_panel, card,
 )
-from components.texts import body, caption
-from themes.themes import instance_themes as themes
+from flet_base.components.texts import body, caption
+from flet_base.themes import instance_themes as themes
 
 async def main(page: ft.Page):
     await themes.awake(page)
@@ -492,12 +498,14 @@ The `components/inputs.py` module provides a wide range of themed input controls
 ## 🛠️ API Reference
 
 ### Text & Selection
+
 * **`text_input(placeholder, ...)`**: A customized `TextField` with support for passwords and multiline.
 * **`dropdown(label, options, ...)`**: A themed `Dropdown` menu.
 * **`checkbox(label, ...)`** / **`switch(label, ...)`**: Boolean selection inputs with theme-aware active colors.
 * **`slider(label, ...)`**: A themed range selector.
 
 ### Pickers
+
 * **`color_picker(color="#FFFFFF", ...)`**: A full-featured color selection dialog.
 * **`date_picker(...)`** / **`date_range_picker(...)`**: Themed date selection utilities.
 * **`time_picker(...)`**: A themed clock-style time picker.
@@ -522,12 +530,12 @@ The `components/modals.py` module provides simplified ways to show `AlertDialogs
 
 Creates an `ft.AlertDialog`. 
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `title_str` | `str` | — | Title text for the modal. |
-| `content` | `list` | — | List of controls to show in the body. |
-| `width` | `int` | `700` | Width of the internal container. |
-| `actions` | `list` | `[Close Button]` | List of buttons at the bottom. |
+| Parameter   | Type   | Default          | Description                           |
+| ----------- | ------ | ---------------- | ------------------------------------- |
+| `title_str` | `str`  | —                | Title text for the modal.             |
+| `content`   | `list` | —                | List of controls to show in the body. |
+| `width`     | `int`  | `700`            | Width of the internal container.      |
+| `actions`   | `list` | `[Close Button]` | List of buttons at the bottom.        |
 
 ### **`bottom_sheet(content, width=700)`**
 
@@ -538,8 +546,8 @@ Creates an `ft.BottomSheet` anchored to the bottom of the page.
 ## 🧪 Usage Example
 
 ```python
-from components.modals import modal, bottom_sheet
-from components.texts import body
+from flet_base.components.modals import modal, bottom_sheet
+from flet_base.components.texts import body
 
 # To show a Modal
 page.show_dialog(
@@ -573,14 +581,15 @@ The `layout/responsive_auto_layout.py` module provides a specialized layout comp
 
 ### **`ResponsiveAutoLayout(content, page, spacing=10, threshold=600)`**
 
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `content` | `list[ft.Control]` | — | The list of controls to be managed by the layout. |
-| `page` | `ft.Page` | — | The active Flet page (required for resize events and padding calculation). |
-| `spacing` | `int` | `10` | Horizontal and vertical gap between elements. |
-| `threshold` | `int` | `600` | Width in pixels below which the layout forces a single column. |
+| Parameter   | Type               | Default | Description                                                                |
+| ----------- | ------------------ | ------- | -------------------------------------------------------------------------- |
+| `content`   | `list[ft.Control]` | —       | The list of controls to be managed by the layout.                          |
+| `page`      | `ft.Page`          | —       | The active Flet page (required for resize events and padding calculation). |
+| `spacing`   | `int`              | `10`    | Horizontal and vertical gap between elements.                              |
+| `threshold` | `int`              | `600`   | Width in pixels below which the layout forces a single column.             |
 
 ### **`control` (Property)**
+
 Returns the root Flet control (a `Container`) that should be added to your page or parent container.
 
 ---
@@ -589,11 +598,11 @@ Returns the root Flet control (a `Container`) that should be added to your page 
 
 ```python
 import flet as ft
-from layout.responsive_auto_layout import ResponsiveAutoLayout
+from flet_base.layout.responsive_auto_layout import ResponsiveAutoLayout
 
 def main(page: ft.Page):
     page.padding = 20
-    
+
     # Create several cards with different widths
     cards = [
         ft.Container(width=200, height=150, bgcolor="amber", content=ft.Text("Card 1")),
@@ -638,7 +647,7 @@ To use the router, instantiate `FletRouter` and pass it to `app.run()`. This rep
 
 ```python
 import flet as ft
-from router import FletRouter, DataSystem
+from flet_base.router import FletRouter, DataSystem
 
 app = FletRouter(
     route_init="/login",  # Starting route
@@ -673,6 +682,7 @@ def home_page(data: DataSystem) -> ft.View:
 - `protected`: If `True`, the router checks if the user is authenticated (using `data.shared["authenticated"]`). If not, redirects to `route_login`.
 
 ### Dynamic Routes & Query Parameters
+
 You can define dynamic segments using `:param_name`:
 
 ```python
@@ -680,7 +690,7 @@ You can define dynamic segments using `:param_name`:
 def user_profile(data: DataSystem) -> ft.View:
     user_id = data.param("id") # Extracts from URL e.g. /user/42 -> 42
     mode = data.query("mode", "view") # Extracts ?mode=edit
-    
+
     return ft.View(
         route=f"/user/{user_id}",
         controls=[ft.Text(f"Profile {user_id} - Mode: {mode}")]
@@ -698,7 +708,7 @@ Middlewares allow you to execute logic before a page loads. They return a `Middl
 Applies to every navigation. Useful for logging or global auth guards:
 
 ```python
-from router import MiddlewareResult
+from flet_base.router import MiddlewareResult
 
 @app.middleware
 def log_navigation(data: DataSystem):
@@ -764,3 +774,145 @@ Create a custom page for unmatched routes:
 def build_404(data: DataSystem) -> ft.View:
     return ft.View(route="/404", controls=[ft.Text("Page not found!")])
 ```
+
+
+
+# 📦 Summary & Project Structure Example
+
+**Flet-base** is a premium starter kit that provides a set of reusable,
+well‑integrated modules to accelerate the development of multi‑platform
+applications with **Python** and **Flet**. It includes:
+
+- 🌍 **Translation Manager** -- CSV‑based i18n with auto‑detection and
+  persistence.
+- 🎨 **Theme Manager** -- Light/dark theme toggling with persistent
+  user preference.
+- 🧩 **UI Components** -- Pre‑styled buttons, texts, data displays,
+  inputs, and modals that automatically adapt to the active theme.
+- 📐 **Responsive Auto Layout** -- A container that dynamically
+  arranges children into rows, scales them if needed, and switches to
+  a single column below a configurable threshold.
+- 🛣️ **Router Manager** -- Decorator‑based routing with dynamic
+  segments, query strings, middlewares, shared state, and layout
+  shells.
+
+All modules are designed to work together seamlessly, allowing you to
+build polished, production‑ready apps with minimal boilerplate.
+
+## 🗂️ Typical Project Structure
+
+Below is a recommended layout for a project using `flet-base`:
+
+```text
+my_app/
+├── assets/
+│   └── translations.csv # All translation strings
+├── src/
+│   ├── __init__.py
+│   ├── main.py # Entry point – config, router, theme setup
+│   ├── pages/
+│   │   ├── __init__.py
+│   │   ├── home.py # Home page view
+│   │   ├── profile.py # Profile page with dynamic route
+│   │   └── settings.py # Settings page
+│   ├── components/ # (Optional) Your own reusable components
+│   │   └── custom_card.py
+│   └── utils/ # (Optional) Helper functions
+├── pyproject.toml (or setup.py)
+└── README.md
+```
+
+## 🚀 Minimal `main.py` Example
+
+The following example demonstrates how to initialise the configuration,
+set up the translation and theme managers, define two pages using the
+router, and start the application.
+
+```python
+import flet as ft
+from flet_base.config import flet_config
+from flet_base.router import FletRouter, DataSystem
+
+# ---- Global configuration ----
+flet_config.translations_csv_path = "assets/translations.csv"
+flet_config.default_language = "en"
+flet_config.default_theme_mode = "light"  # Can be "light" or "dark"
+
+# ---- Router instance ----
+app = FletRouter(route_init="/", route_login="/login")
+
+# ---- Pages ----
+@app.page("/", title="Home")
+def home_page(data: DataSystem) -> ft.View:
+    from flet_base.translations import instance_translation_manager as tm
+    from flet_base.components.texts import title
+
+    # Translate a string
+    welcome = tm.translate("welcome_message")
+
+    return ft.View(
+        route="/",
+        controls=[
+            title(welcome, size=32),
+            ft.ElevatedButton("Go to Profile", on_click=data.go("/profile/42")),
+        ],
+    )
+
+
+@app.page("/profile/:user_id", title="User Profile")
+def profile_page(data: DataSystem) -> ft.View:
+    from flet_base.components.texts import body
+
+    user_id = data.param("user_id")
+
+    return ft.View(
+        route=f"/profile/{user_id}",
+        controls=[
+            body(f"Viewing profile of user {user_id}"),
+            ft.ElevatedButton("Back", on_click=data.go_back()),
+        ],
+    )
+
+
+# ---- Global shell (adds an AppBar to every page except login) ----
+@app.shell(exclude=["/login"])
+def add_appbar(data: DataSystem, view: ft.View) -> ft.View:
+    from flet_base.themes import instance_themes as themes
+
+    view.appbar = ft.AppBar(
+        title=ft.Text("My Flet App"),
+        bgcolor=themes.actual_theme["primary"],
+        color=themes.actual_theme["on_primary"],
+    )
+
+    return view
+
+
+# ---- Run the app ----
+if __name__ == "__main__":
+    app.run()
+```
+
+## 🔍 Key Points
+
+- The global config (`flet_config`) lets you set defaults for
+  translations and themes before importing any manager.
+- The translation manager reads strings from `translations.csv` (see
+  the required format in the Translations section).
+- The theme manager is automatically used by the components; you can
+  also switch themes manually.
+- The router handles navigation, dynamic routes, and middlewares.
+
+The `DataSystem` object passed to every view provides access to:
+
+- Route parameters
+- Query strings
+- Shared state
+- Navigation helpers
+
+Components (buttons, texts, etc.) are **theme‑aware**. They fetch
+colours from the active theme, ensuring visual consistency throughout
+the app.
+
+This structure keeps your code organised, separates concerns, and lets
+you leverage the full power of **flet-base** with minimal friction.

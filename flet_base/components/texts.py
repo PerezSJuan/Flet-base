@@ -1,6 +1,6 @@
 import flet as ft
 
-from themes.themes import instance_themes as themes
+from flet_base.themes.themes import instance_themes as themes
 
 
 def markdown(md, size=12):

@@ -40,9 +40,26 @@ class themes:
 
     actual_theme = None
 
-    def __init__(self, default_theme=light_theme):
-        self.light_theme = light_theme
-        self.dark_theme = dark_theme
+    def __init__(self, default_theme=None):
+        self.light_theme = light_theme.copy()
+        self.dark_theme = dark_theme.copy()
+        
+        try:
+            from flet_base.config import flet_config
+            if flet_config.light_theme_override:
+                self.light_theme.update(flet_config.light_theme_override)
+            if flet_config.dark_theme_override:
+                self.dark_theme.update(flet_config.dark_theme_override)
+            
+            if default_theme is None:
+                mode = getattr(flet_config, "default_theme_mode", "light")
+                default_theme = self.dark_theme if mode == "dark" else self.light_theme
+        except ImportError:
+            pass
+            
+        if default_theme is None:
+            default_theme = self.light_theme
+            
         self.default_theme = default_theme
         self.actual_theme = default_theme
 

@@ -32,9 +32,21 @@ class ResponsiveAutoLayout:
         self,
         content: Union[list[ft.Control], ft.Control],
         page: ft.Page,
-        spacing: int = 10,
-        threshold: int = 600,
+        spacing: int = None,
+        threshold: int = None,
     ):
+        try:
+            from flet_base.config import flet_config
+            if spacing is None:
+                spacing = flet_config.default_layout_spacing
+            if threshold is None:
+                threshold = flet_config.default_layout_threshold
+        except ImportError:
+            if spacing is None:
+                spacing = 10
+            if threshold is None:
+                threshold = 600
+
         self._children = content if isinstance(content, list) else [content]
         self._page = page
         self._spacing = spacing

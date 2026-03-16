@@ -6,8 +6,12 @@ Run with: flet run examples/layout_test.py
 Requires Flet >= 0.80.0
 """
 
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import flet as ft
-from layout.responsive_auto_layout import ResponsiveAutoLayout
+from flet_base.layout.responsive_auto_layout import ResponsiveAutoLayout
 
 
 def _make_card(color, icon, title, subtitle, w=160, h=130):

@@ -2,7 +2,7 @@ import datetime
 import flet as ft
 from flet_color_pickers import ColorPicker
 
-from themes.themes import instance_themes as themes
+from flet_base.themes.themes import instance_themes as themes
 
 
 def switch(label, on_change=None, value=False, enabled=True):

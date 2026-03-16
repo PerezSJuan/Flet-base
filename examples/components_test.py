@@ -1,7 +1,11 @@
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import flet as ft
 
-from components.buttons import filled_btn, icon_filled_btn, icon_btn, text_btn, btn
-from components.inputs import (
+from flet_base.components.buttons import filled_btn, icon_filled_btn, icon_btn, text_btn, btn
+from flet_base.components.inputs import (
     switch,
     text_input,
     checkbox,
@@ -12,7 +16,7 @@ from components.inputs import (
     dropdown,
     slider,
 )
-from components.data_display import (
+from flet_base.components.data_display import (
     card,
     expansion_panel,
     icon,
@@ -21,7 +25,7 @@ from components.data_display import (
     loading_indicator,
     datatable,
 )
-from components.texts import (
+from flet_base.components.texts import (
     title,
     title_primary,
     subtitle,
@@ -33,9 +37,9 @@ from components.texts import (
     markdown,
     link,
 )
-from components.modals import modal, bottom_sheet
+from flet_base.components.modals import modal, bottom_sheet
 import flet_datatable2 as fdt
-from themes.themes import instance_themes as themes
+from flet_base.themes.themes import instance_themes as themes
 
 
 async def main(page: ft.Page):

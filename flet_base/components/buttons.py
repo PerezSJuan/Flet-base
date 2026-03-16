@@ -1,7 +1,7 @@
 import flet as ft
 
 
-from themes.themes import instance_themes as themes
+from flet_base.themes.themes import instance_themes as themes
 
 
 def filled_btn(text, icon=None, on_click=None, enabled=True):

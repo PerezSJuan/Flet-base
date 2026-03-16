@@ -42,18 +42,30 @@ class TranslationManager:
     and the subsequent columns are language codes (e.g., 'en', 'es').
     """
 
-    def __init__(self, csv_path: str = None, default_lang: str = "en") -> None:
-        if csv_path is None:
-            csv_path = os.path.join(os.path.dirname(__file__), "translations.csv")
-            if not os.path.isfile(csv_path):
-                raise FileNotFoundError(f"Translation CSV not found at {csv_path}")
-
+    
+    def __init__(self, csv_path: str = None, default_lang: str = None) -> None:
+        try:
+            from flet_base.config import flet_config
+            if csv_path is None:
+                csv_path = flet_config.translations_csv_path
+            if default_lang is None:
+                default_lang = getattr(flet_config, "default_language", "en")
+        except ImportError:
+            pass
+            
+        if default_lang is None:
+            default_lang = "en"
+            
         self.csv_path = csv_path
         self.default_lang = default_lang
         self.active_lang = default_lang
         self.translations: Dict[str, Dict[str, str]] = {}
-        self.available_languages: List[str] = []
-        self._load_csv()
+        self.available_languages: List[str] = [default_lang]
+        
+        if self.csv_path and os.path.isfile(self.csv_path):
+            self._load_csv()
+        elif self.csv_path:
+            print(f"Warning: Translation CSV not found at {self.csv_path}. Proceeding with default empty dictionary.")
 
     @staticmethod
     def get_language_name(code: str) -> str:
