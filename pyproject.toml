@@ -10,16 +10,35 @@ authors = [
     {name = "PerezSJuan"}
 ]
 readme = "README.md"
+license = {file = "LICENSE"}
 requires-python = ">=3.8"
+keywords = ["flet", "gui", "framework", "responsive", "starter-kit", "multiplatform"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: User Interfaces",
+]
 dependencies = [
     "flet",
     "flet_datatable2",
     "flet_color_pickers",
 ]
 
-[tool.setuptools]
-packages = ["flet_base", "flet_base.components", "flet_base.layout", "flet_base.router", "flet_base.themes", "flet_base.translations"]
+[project.urls]
+Homepage = "https://github.com/PerezSJuan/Flet-base"
+"Bug Tracker" = "https://github.com/PerezSJuan/Flet-base/issues"
 
+[tool.setuptools]
+packages = [
+    "flet_base",
+    "flet_base.components",
+    "flet_base.layout",
+    "flet_base.router",
+    "flet_base.themes",
+    "flet_base.translations",
+]
 
 [tool.setuptools.package-data]
-translations = ["*.csv"]
+"flet_base.translations" = ["*.csv"]
