@@ -15,6 +15,7 @@ from flet_base.config import flet_config
 
 # Point to the CSV bundled with examples
 flet_config.translations_csv_path = os.path.join(os.path.dirname(__file__), "translations.csv")
+flet_config.translations_csv_separator = ","
 flet_config.default_language = "en"
 
 # Import AFTER config is set so the module-level instance picks it up

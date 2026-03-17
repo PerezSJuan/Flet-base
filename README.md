@@ -1,6 +1,6 @@
 # 🚀 Flet-base Template
 
-A premium starter kit for building multi-platform applications with Python and Flet.
+A premium unofficial starter kit for building multi-platform applications with Python and Flet. 
 
 ---
 
@@ -64,12 +64,13 @@ A robust and simple utility to manage multi-language support in **Flet** applica
 
 ### **Core Methods**
 
-#### **`TranslationManager(csv_path=None, default_lang="en")`**
+#### **`TranslationManager(csv_path=None, default_lang="en", csv_separator=",")`**
 
 Creates a new manager instance.
 
 - **`csv_path`**: Optional. Path to your translation file. If omitted, the manager uses `flet_config.translations_csv_path`. If neither is configured, the manager will start empty safely and log a warning to the console.
 - **`default_lang`**: Optional. Override the `flet_config.default_language` fallback.
+- **`csv_separator`**: Optional. Override the `flet_config.translations_csv_separator` fallback (default is `","`).
 
 #### **`awake(page: ft.Page)`**
 
@@ -119,6 +120,7 @@ from flet_base.config import flet_config
 
 # 0. Point to your CSV file before taking translations
 flet_config.translations_csv_path = "assets/translations.csv"
+flet_config.translations_csv_separator = "," # Optional
 
 from flet_base.translations import instance_translation_manager as tm
 
@@ -836,6 +838,7 @@ from flet_base.router import FletRouter, DataSystem
 # ---- Global configuration ----
 flet_config.translations_csv_path = "assets/translations.csv"
 flet_config.default_language = "en"
+flet_config.translations_csv_separator = "," # Optional
 flet_config.default_theme_mode = "light"  # Can be "light" or "dark"
 
 # ---- Router instance ----

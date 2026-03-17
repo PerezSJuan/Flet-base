@@ -43,21 +43,26 @@ class TranslationManager:
     """
 
     
-    def __init__(self, csv_path: str = None, default_lang: str = None) -> None:
+    def __init__(self, csv_path: str = None, default_lang: str = None, csv_separator: str = None) -> None:
         try:
             from flet_base.config import flet_config
             if csv_path is None:
                 csv_path = flet_config.translations_csv_path
             if default_lang is None:
                 default_lang = getattr(flet_config, "default_language", "en")
+            if csv_separator is None:
+                csv_separator = getattr(flet_config, "translations_csv_separator", ",")
         except ImportError:
             pass
             
         if default_lang is None:
             default_lang = "en"
+        if csv_separator is None:
+            csv_separator = ","
             
         self.csv_path = csv_path
         self.default_lang = default_lang
+        self.csv_separator = csv_separator
         self.active_lang = default_lang
         self.translations: Dict[str, Dict[str, str]] = {}
         self.available_languages: List[str] = [default_lang]
@@ -119,7 +124,7 @@ class TranslationManager:
             return
 
         with open(self.csv_path, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
+            reader = csv.DictReader(f, delimiter=self.csv_separator)
             if reader.fieldnames:
                 self.available_languages = list(reader.fieldnames[1:])
                 key_field = reader.fieldnames[0]

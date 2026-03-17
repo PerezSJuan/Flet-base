@@ -11,6 +11,7 @@ class FletBaseConfig:
         # Provide an absolute path to your custom translations CSV here.
         # If None, the default internal translations.csv will be used.
         self.translations_csv_path: Optional[str] = None
+        self.translations_csv_separator: str = ","
         self.default_language: str = "en"
         
         # --- Themes Configuration ---
