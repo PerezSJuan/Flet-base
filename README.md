@@ -60,6 +60,11 @@ A robust and simple utility to manage multi-language support in **Flet** applica
 
 ---
 
+> [!IMPORTANT]
+> The `translations_csv_path` in `flet_config` is **vital**. You must provide an absolute path to your translations CSV for the manager to function. If not set, translations will not be loaded.
+
+---
+
 ## 🛠️ Internal Structure & API
 
 ### **Core Methods**
@@ -206,27 +211,22 @@ falls back to `awake()` behaviour.
 
 Even if you change theme, app's border might not change color because it is fixed in system configuration, for example in windows. 
 
-### 🛠️Change theme colors
+### 🛠️ Change theme colors
 
-In `themes.py` there are two objects about colors: dark and light theme. You can modify it easily, there is only one limit: you can not have different color names in one palette than in other. Changing some color's name will probably break component scheme, so do it carefuly. 
+> [!IMPORTANT]
+> Custom themes MUST follow the key structure shown below. UI components (like buttons and texts) rely on these specific keys (e.g., `primary`, `on_primary`, `text_color`, etc.) to style themselves correctly. Removing keys will break the UI components.
+
+You can modify themes globally using `flet_config`:
 
 ```python
-light_theme = {
-    "primary": "#6200EE",
-    "on_primary": "#FFFFFF",
-    "secondary": "#03DAC6",
-    "on_secondary": "#000000",
-    "background": "#FFFFFF",
-    "on_background": "#000000",
-    "surface": "#FFFFFF",
-    "on_surface": "#000000",
-    "error": "#B00020",
-    "on_error": "#FFFFFF",
-    "warning": "#FFB300",
-    "success": "#388E3C",
-}
+from flet_base.config import flet_config
 
-dark_theme = {
+# Modify existing keys
+flet_config.light_theme["primary"] = "#6200EE"
+flet_config.light_theme["text_color"] = "#000000"
+
+# Or provide a whole new dictionary (ensure all keys are present)
+flet_config.dark_theme = {
     "primary": "#BB86FC",
     "on_primary": "#000000",
     "secondary": "#03DAC6",
@@ -235,10 +235,12 @@ dark_theme = {
     "on_background": "#FFFFFF",
     "surface": "#1E1E1E",
     "on_surface": "#FFFFFF",
+    "text_color": "#FFFFFF",
     "error": "#CF6679",
     "on_error": "#000000",
     "warning": "#FFB300",
     "success": "#66BB6A",
+    "link": "#5252FF",
 }
 ```
 
@@ -831,67 +833,146 @@ set up the translation and theme managers, define two pages using the
 router, and start the application.
 
 ```python
+import os
+import sys
+
+# Allow running from the project root
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import flet as ft
+import flet_base.router as fr
 from flet_base.config import flet_config
-from flet_base.router import FletRouter, DataSystem
+from flet_base.translations import instance_translation_manager as tm
+from flet_base.themes import instance_themes as themes
+import flet_base.components.buttons as btn
+import flet_base.components.texts as txt
+import flet_base.components.data_display as dd
+import flet_base.components.inputs as inputs
 
-# ---- Global configuration ----
-flet_config.translations_csv_path = "assets/translations.csv"
-flet_config.default_language = "en"
-flet_config.translations_csv_separator = "," # Optional
-flet_config.default_theme_mode = "light"  # Can be "light" or "dark"
+# ======================================================
+# GLOBAL CONFIGURATION
+# ======================================================
 
-# ---- Router instance ----
-app = FletRouter(route_init="/", route_login="/login")
+flet_config.translations_csv_path = os.path.join(os.path.dirname(__file__), "translations.csv")
+flet_config.default_theme_mode = "light"
 
-# ---- Pages ----
-@app.page("/", title="Home")
-def home_page(data: DataSystem) -> ft.View:
-    from flet_base.translations import instance_translation_manager as tm
-    from flet_base.components.texts import title
+# ======================================================
+# CREATE THE ROUTER
+# ======================================================
 
-    # Translate a string
-    welcome = tm.translate("welcome_message")
+app = fr.FletRouter(
+    route_init="/home",
+)
 
-    return ft.View(
-        route="/",
-        controls=[
-            title(welcome, size=32),
-            ft.ElevatedButton("Go to Profile", on_click=data.go("/profile/42")),
-        ],
-    )
+# ======================================================
+# MIDDLEWARE & SHELLS
+# ======================================================
 
+@app.middleware
+async def init_systems(data: fr.DataSystem):
+    """Initializes themes and translations systems."""
+    await tm.awake(data.page)
+    await themes.awake(data.page)
+    return fr.MiddlewareResult.next()
 
-@app.page("/profile/:user_id", title="User Profile")
-def profile_page(data: DataSystem) -> ft.View:
-    from flet_base.components.texts import body
+@app.shell()
+def main_shell(data: fr.DataSystem, view: ft.View) -> ft.View:
+    """Global shell with Navigation Controls."""
 
-    user_id = data.param("user_id")
+    # Theme toggle icon
+    theme_icon = ft.Icons.DARK_MODE if themes.actual_theme == themes.light_theme else ft.Icons.LIGHT_MODE
 
-    return ft.View(
-        route=f"/profile/{user_id}",
-        controls=[
-            body(f"Viewing profile of user {user_id}"),
-            ft.ElevatedButton("Back", on_click=data.go_back()),
-        ],
-    )
+    async def toggle_theme(_):
+        await themes.switch_theme(data.page)
+        # Re-build the view to apply new theme colors to all components
+        data.page.go(data.page.route)
 
-
-# ---- Global shell (adds an AppBar to every page except login) ----
-@app.shell(exclude=["/login"])
-def add_appbar(data: DataSystem, view: ft.View) -> ft.View:
-    from flet_base.themes import instance_themes as themes
+    async def change_lang(e):
+        code = tm.get_language_code(e.data)
+        await tm.set_language(code, data.page)
+        # Force the router to re-build the current view with new translations
+        data.page.go(data.page.route)
 
     view.appbar = ft.AppBar(
-        title=ft.Text("My Flet App"),
-        bgcolor=themes.actual_theme["primary"],
-        color=themes.actual_theme["on_primary"],
+        title=txt.title("Flet-base Demo", size=20),
+        bgcolor=themes.actual_theme["surface"],
+        actions=[
+            ft.IconButton(theme_icon, on_click=toggle_theme),
+            inputs.dropdown(
+                label="Language",
+                options=[ft.dropdown.Option(lang) for lang in tm.get_available_languages()],
+                value=tm.get_language_name(tm.active_lang),
+                on_change=change_lang,
+            ),
+        ]
     )
-
     return view
 
+# ======================================================
+# PAGE 1: HOME
+# ======================================================
 
-# ---- Run the app ----
+@app.page("/home", title="Home")
+def home_page(data: fr.DataSystem) -> ft.View:
+    return ft.View(
+        route="/home",
+        controls=[
+            txt.title_primary(tm.translate("welcome")),
+            txt.body(f"Current language: {tm.get_language_name(tm.active_lang)}"),
+            dd.card(
+                content=[
+                    txt.subtitle("Package Highlights"),
+                    txt.body("- Router-based navigation\n- Theme Management\n- I18n support\n- Premium Components"),
+                ]
+            ),
+            btn.filled_btn(tm.translate("settings"), icon=ft.Icons.SETTINGS, on_click=lambda _: data.page.go("/about")),
+        ],
+        vertical_alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    )
+
+
+# ======================================================
+# PAGE 2: ABOUT (Used as Settings here)
+# ======================================================
+
+@app.page("/about", title="About / Settings")
+def about_page(data: fr.DataSystem) -> ft.View:
+    return ft.View(
+        route="/about",
+        controls=[
+            txt.title_secondary(tm.translate("settings")),
+            dd.icon(ft.Icons.INFO_OUTLINE, size=50),
+            dd.progress_bar(value=0.5),
+            txt.body("This page demonstrates more components and translated text."),
+            btn.text_btn(tm.translate("goodbye"), on_click=lambda _: data.page.go("/home")),
+        ],
+        vertical_alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    )
+
+
+# ======================================================
+# 404 PAGE
+# ======================================================
+
+@app.page_404
+def not_found(data: fr.DataSystem) -> ft.View:
+    return ft.View(
+        route="/404",
+        controls=[
+            txt.error_text("404 - Page Not Found", size=30),
+            btn.filled_btn("Go Home", on_click=lambda _: data.page.go("/home")),
+        ],
+        vertical_alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+    )
+
+
+# ======================================================
+# RUN THE APP
+# ======================================================
+
 if __name__ == "__main__":
     app.run()
 ```

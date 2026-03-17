@@ -14,7 +14,6 @@ Features:
 
 from __future__ import annotations
 
-import asyncio
 import inspect
 from typing import Any, Callable
 
@@ -294,7 +293,7 @@ class FletRouter:
 
         return None, {}
 
-    def run_middlewares(
+    async def run_middlewares(
         self,
         middlewares: list[Callable],
         data: DataSystem,
@@ -302,12 +301,7 @@ class FletRouter:
         """Runs a chain of middlewares. Stops at the first one that is not .next()"""
         for mw in middlewares:
             if inspect.iscoroutinefunction(mw):
-                # Async middleware: run in the event loop if it exists
-                try:
-                    loop = asyncio.get_event_loop()
-                    result = loop.run_until_complete(mw(data))
-                except RuntimeError:
-                    result = asyncio.run(mw(data))
+                result = await mw(data)
             else:
                 result = mw(data)
 
@@ -323,28 +317,20 @@ class FletRouter:
 
         return MiddlewareResult.next()
 
-    def apply_shells(self, path: str, data: DataSystem, view: ft.View) -> ft.View:
+    async def apply_shells(self, path: str, data: DataSystem, view: ft.View) -> ft.View:
         """Applies all shells that correspond to the current route."""
         for shell in self.shells_list:
             if shell.applies_to(path):
                 if inspect.iscoroutinefunction(shell.func):
-                    try:
-                        loop = asyncio.get_event_loop()
-                        view = loop.run_until_complete(shell.apply(data, view))
-                    except RuntimeError:
-                        view = asyncio.run(shell.apply(data, view))
+                    view = await shell.apply(data, view)
                 else:
                     view = shell.apply(data, view)
         return view
 
-    def build_view(self, page: PageSystem, data: DataSystem) -> ft.View | None:
+    async def build_view(self, page: PageSystem, data: DataSystem) -> ft.View | None:
         """Builds the view by calling the page function."""
         if inspect.iscoroutinefunction(page.func):
-            try:
-                loop = asyncio.get_event_loop()
-                view = loop.run_until_complete(page.build(data))
-            except RuntimeError:
-                view = asyncio.run(page.build(data))
+            view = await page.build(data)
         else:
             view = page.build(data)
         return view
@@ -352,21 +338,22 @@ class FletRouter:
     def handle_route_change(self, page: ft.Page) -> Callable:
         """Returns the handler for the route change event."""
 
-        def _handler(e: ft.RouteChangeEvent) -> None:
+        async def _handler(e: ft.RouteChangeEvent) -> None:
             full_route: str = e.route
             path, query_params = parse_route(full_route)
 
-            # Update history
+            # Update history (avoid duplicates on refresh)
             if not hasattr(page, "_fr_history"):
                 page._fr_history = []  # type: ignore[attr-defined]
             history: list[str] = page._fr_history  # type: ignore[attr-defined]
-            history.append(full_route)
+            if not history or history[-1] != full_route:
+                history.append(full_route)
 
             # Create base DataSystem object (no route params yet)
             data = DataSystem(page, self, query_params=query_params)
 
             # Run global middlewares
-            global_result = self.run_middlewares(self.global_middlewares_list, data)
+            global_result = await self.run_middlewares(self.global_middlewares_list, data)
             if global_result.should_redirect:
                 page.go(global_result.target)
                 return
@@ -382,7 +369,10 @@ class FletRouter:
             if matched_page is None:
                 # 404
                 if self.page_404_handler:
-                    view_404 = self.page_404_handler(data)
+                    if inspect.iscoroutinefunction(self.page_404_handler):
+                        view_404 = await self.page_404_handler(data)
+                    else:
+                        view_404 = self.page_404_handler(data)
                     page.views.clear()
                     page.views.append(view_404)
                 else:
@@ -420,7 +410,7 @@ class FletRouter:
 
             # Specific page middlewares
             if matched_page.middlewares:
-                page_result = self.run_middlewares(matched_page.middlewares, data)
+                page_result = await self.run_middlewares(matched_page.middlewares, data)
                 if page_result.should_redirect:
                     page.go(page_result.target)
                     return
@@ -431,7 +421,7 @@ class FletRouter:
                     return
 
             # Build the view
-            view = self.build_view(matched_page, data)
+            view = await self.build_view(matched_page, data)
 
             if view is None:
                 return
@@ -441,7 +431,7 @@ class FletRouter:
                 page.title = matched_page.title
 
             # Apply shells
-            view = self.apply_shells(path, data, view)
+            view = await self.apply_shells(path, data, view)
 
             # Update views in the stack
             page.views.clear()
@@ -465,7 +455,7 @@ class FletRouter:
     # EXECUTION
     # ══════════════════════════════════════════════
 
-    def main_entry(self, page: ft.Page) -> None:
+    async def main_entry(self, page: ft.Page) -> None:
         """Main entry point for the Flet application."""
         # Initialize page-specific context
         if not hasattr(page, "_fr_shared"):
@@ -496,7 +486,7 @@ class FletRouter:
             page.on_error = _error_handler
 
         # Navigate to the initial route
-        page.go(self.route_init)
+        await page.push_route(self.route_init)
 
     def run(
         self,

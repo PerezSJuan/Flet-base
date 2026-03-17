@@ -109,7 +109,6 @@ class ResponsiveAutoLayout:
         (opacity=0) and the layout is built when all are measured.
         In the fallback case, the layout is built immediately.
         """
-        print("\n── Measuring Controls ───────────────────────────────")
         wrappers = []
         fallback_needed = False
 
@@ -125,9 +124,6 @@ class ResponsiveAutoLayout:
                     if exp is not None:
                         deviation = real - int(exp)
                         status = "OK" if abs(deviation) <= 1 else f"DEVIATION: {deviation:+d}px"
-                        print(f"  [control #{idx}] real: {real}px  expected: {int(exp)}px  → {status}")
-                    else:
-                        print(f"  [control #{idx}] real: {real}px  expected: N/A (no declared .width)")
                     # When all controls are measured, build the layout
                     if all(w is not None for w in self._widths):
                         self._build_layout()
@@ -158,10 +154,6 @@ class ResponsiveAutoLayout:
                 measured = w if w is not None else self._FALLBACK_WIDTH
                 self._widths[i] = measured
                 # Debug: real width vs expected (in this mode "real" = declared)
-                if w is not None:
-                    print(f"  [control #{i}] real: {int(measured)}px  expected: {int(measured)}px  → OK (read from .width)")
-                else:
-                    print(f"  [control #{i}] real: N/A  expected: N/A  → FALLBACK {self._FALLBACK_WIDTH}px (no declared .width)")
                 wrappers.append(child)
 
         self._inner.controls = wrappers
@@ -209,13 +201,6 @@ class ResponsiveAutoLayout:
         else:
             elements = {i: int(self._widths[i]) for i in range(len(self._children))}
             result = self._process_widths(elements, int(available), self._spacing)
-
-        print(
-            f"ResponsiveAutoLayout → width={int(width)}px "
-            f"available={int(available)}px rows={len(result)}"
-        )
-        print(f"  widths: {[int(w) for w in self._widths]}")
-        print(f"  groups: {list(result.keys())}")
 
         rows = []
         for key, scale in result.items():

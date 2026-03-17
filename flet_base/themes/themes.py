@@ -1,39 +1,5 @@
 import flet as ft
-
-light_theme = {
-    "primary": "#6200EE",
-    "on_primary": "#FFFFFF",
-    "secondary": "#03DAC6",
-    "on_secondary": "#000000",
-    "background": "#FFFFFF",
-    "on_background": "#000000",
-    "surface": "#FFFFFF",
-    "on_surface": "#000000",
-    "text_color": "#000000",
-    "error": "#B00020",
-    "on_error": "#FFFFFF",
-    "warning": "#FFB300",
-    "success": "#388E3C",
-    "link": "#0000FF",
-}
-
-dark_theme = {
-    "primary": "#BB86FC",
-    "on_primary": "#000000",
-    "secondary": "#03DAC6",
-    "on_secondary": "#000000",
-    "background": "#121212",
-    "on_background": "#FFFFFF",
-    "surface": "#1E1E1E",
-    "on_surface": "#FFFFFF",
-    "text_color": "#FFFFFF",
-    "error": "#CF6679",
-    "on_error": "#000000",
-    "warning": "#FFB300",
-    "success": "#66BB6A",
-    "link": "#5252FF",
-}
-
+from flet_base.config import flet_config
 
 class themes:
     """Helper class that manages light/dark theme switching."""
@@ -41,24 +7,18 @@ class themes:
     actual_theme = None
 
     def __init__(self, default_theme=None):
-        self.light_theme = light_theme.copy()
-        self.dark_theme = dark_theme.copy()
+        self.light_theme = flet_config.light_theme
+        self.dark_theme = flet_config.dark_theme
         
-        try:
-            from flet_base.config import flet_config
-            if flet_config.light_theme_override:
-                self.light_theme.update(flet_config.light_theme_override)
-            if flet_config.dark_theme_override:
-                self.dark_theme.update(flet_config.dark_theme_override)
-            
-            if default_theme is None:
-                mode = getattr(flet_config, "default_theme_mode", "light")
-                default_theme = self.dark_theme if mode == "dark" else self.light_theme
-        except ImportError:
-            pass
-            
+        # Apply overrides if provided in config
+        if flet_config.light_theme_override:
+            self.light_theme.update(flet_config.light_theme_override)
+        if flet_config.dark_theme_override:
+            self.dark_theme.update(flet_config.dark_theme_override)
+        
         if default_theme is None:
-            default_theme = self.light_theme
+            mode = flet_config.default_theme_mode
+            default_theme = self.dark_theme if mode == "dark" else self.light_theme
             
         self.default_theme = default_theme
         self.actual_theme = default_theme

@@ -70,7 +70,7 @@ class TranslationManager:
         if self.csv_path and os.path.isfile(self.csv_path):
             self._load_csv()
         elif self.csv_path:
-            print(f"Warning: Translation CSV not found at {self.csv_path}. Proceeding with default empty dictionary.")
+            print(f"Error: Translation CSV not found at {self.csv_path}.")
 
     @staticmethod
     def get_language_name(code: str) -> str:
@@ -91,14 +91,23 @@ class TranslationManager:
         return name
 
     async def awake(self, page: ft.Page) -> None:
-        """Initialize user language preferences from SharedPreferences().
+        """Initialize user language preferences from SharedPreferences()."""
+        
+        # Try to pull path from config if not already set (handles late configuration)
+        if not self.csv_path:
+            try:
+                from flet_base.config import flet_config
+                if flet_config.translations_csv_path:
+                    self.csv_path = flet_config.translations_csv_path
+                    self._load_csv()
+            except ImportError:
+                pass
 
-        Call this once after the page is ready:
-
-            async def main(page: ft.Page):
-                tm = TranslationManager()
-                await tm.awake(page)
-        """
+        if not self.csv_path:
+            print("Warning: [VITAL] translations_csv_path is not set in flet_config. "
+                  "Translations will not be loaded. Please set an absolute path to your translations CSV "
+                  "before calling awake().")
+        
         self._page = page
 
         stored_language = await ft.SharedPreferences().get("language")
