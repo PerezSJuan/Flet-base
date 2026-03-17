@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flet-base"
-version = "0.1.2"
-description = "A premium starter kit for building multi-platform applications with Python and Flet."
+version = "0.1.3"
+description = "A premium unofficial starter kit for building multi-platform applications with Python and Flet."
 authors = [
     {name = "PerezSJuan"}
 ]
