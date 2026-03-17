@@ -190,7 +190,7 @@ class FletRouter:
                     "/404",
                     controls=[
                         ft.Text("404 - Page not found", size=32),
-                        ft.ElevatedButton("Go to home", on_click=data.go("/home")),
+                        ft.FilledButton("Go to home", on_click=data.go("/home")),
                     ],
                     vertical_alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -355,7 +355,7 @@ class FletRouter:
             # Run global middlewares
             global_result = await self.run_middlewares(self.global_middlewares_list, data)
             if global_result.should_redirect:
-                page.go(global_result.target)
+                page.push_route(global_result.target)
                 return
             if global_result.has_view:
                 page.views.clear()
@@ -385,9 +385,9 @@ class FletRouter:
                                     [
                                         ft.Text("404", size=64, weight=ft.FontWeight.BOLD),
                                         ft.Text(f"Route not found: {path}"),
-                                        ft.ElevatedButton(
+                                        ft.FilledButton(
                                             "Back to start",
-                                            on_click=lambda _: page.go(self.route_init),
+                                            on_click=lambda _: page.push_route(self.route_init),
                                         ),
                                     ],
                                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -405,14 +405,14 @@ class FletRouter:
 
             # Route protection
             if matched_page.protected and not data.shared.get("authenticated"):
-                page.go(self.route_login)
+                page.push_route(self.route_login)
                 return
 
             # Specific page middlewares
             if matched_page.middlewares:
                 page_result = await self.run_middlewares(matched_page.middlewares, data)
                 if page_result.should_redirect:
-                    page.go(page_result.target)
+                    page.push_route(page_result.target)
                     return
                 if page_result.has_view:
                     page.views.clear()

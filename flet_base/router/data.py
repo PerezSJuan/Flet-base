@@ -83,7 +83,7 @@ class DataSystem:
     def go(self, route: str, **kwargs: Any) -> Callable:
         """
         Returns an event handler that navigates to the indicated route.
-        Usage: ft.ElevatedButton("Go", on_click=data.go("/home"))
+        Usage: ft.FilledButton("Go", on_click=data.go("/home"))
 
         Also accepts extra parameters that are stored in shared before navigating:
             data.go("/profile", user_id=42)
@@ -91,7 +91,7 @@ class DataSystem:
         def _handler(e: Any = None) -> None:
             if kwargs:
                 self.page_instance._fr_shared.update(kwargs)  # type: ignore[attr-defined]
-            self.page_instance.go(route)
+            self.page_instance.push_route(route)
 
         return _handler
 
@@ -106,14 +106,14 @@ class DataSystem:
             target = history[-2]
             history.pop()  # remove current
             history.pop()  # remove target so go() can add it back
-            self.page_instance.go(target)
+            self.page_instance.push_route(target)
 
     def redirect(self, route: str) -> None:
         """
         Redirects immediately to another route (useful within middleware).
         Unlike go(), it doesn't return a handler: it executes the navigation immediately.
         """
-        self.page_instance.go(route)
+        self.page_instance.push_route(route)
 
     # ──────────────────────────────────────────────
     # Utilities
