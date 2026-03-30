@@ -11,6 +11,7 @@ def markdown(md, size=12):
         value=md,
         selectable=True,
         md_style_sheet=style,
+        extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
         latex_style=ft.TextStyle(color=themes.actual_theme["text_color"], size=size),
     )
 
