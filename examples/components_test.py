@@ -8,6 +8,7 @@ from flet_base.components.buttons import filled_btn, icon_filled_btn, icon_btn, 
 from flet_base.components.inputs import (
     switch,
     text_input,
+    text_input_autocomplete,
     checkbox,
     color_picker,
     date_picker,
@@ -263,6 +264,17 @@ This is a **markdown** example.
                             multiline=True,
                             max_lines=4,
                         ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                ),
+                # Text input with autocomplete
+                ft.Row(
+                    [
+                        text_input_autocomplete(
+                            placeholder="Type to search...",
+                            suggestions=["United States", "United Kingdom", "Canada", "Australia"],
+                            on_change=lambda e: print(f"Selected: {e.control.value}")
+                        )
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                 ),

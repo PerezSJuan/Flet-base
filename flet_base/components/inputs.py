@@ -27,7 +27,7 @@ def text_input(
     multiline=False,
     max_lines=1,
 ):
-    """It creates a text input with autocomplete functionality.
+    """It creates a text input without autocomplete functionality.
     The autocomplete options can be easily modified to fit your needs."""
     return ft.TextField(
         label=placeholder,
@@ -41,6 +41,36 @@ def text_input(
         max_lines=max_lines,
     )
 
+def text_input_autocomplete(
+    placeholder,
+    suggestions: list[str],
+    on_change=None,
+    width=400
+):
+    """It creates a text input with autocomplete functionality.
+    The autocomplete options can be easily modified to fit your needs."""
+    text_input_autocomplete = ft.AutoComplete (
+        suggestions= [ft.AutoCompleteSuggestion(key=s, value=s) for s in suggestions],
+        on_select=on_change,
+    )
+    return ft.Column(
+        controls=[
+            ft.Text(
+                placeholder,
+                color=themes.actual_theme["text_color"],
+            ),
+            ft.AutoComplete(
+                suggestions=[ft.AutoCompleteSuggestion(key=s, value=s) for s in suggestions],
+                on_change=on_change,
+                # propiedades heredadas de LayoutControl
+                expand=True,  # ocupa todo el ancho disponible
+                margin=ft.margin.symmetric(horizontal=12, vertical=4),
+                width=width,
+                
+            ),
+        ],
+        spacing=4,
+    )
 
 def checkbox(label, on_change=None, value=False, enabled=True):
     """It creates a checkbox with the specified label and change
