@@ -22,10 +22,17 @@ class themes:
             
         self.default_theme = default_theme
         self.actual_theme = default_theme
+        
+    def _apply_typography(self, page):
+        page.fonts = flet_config.font_files.copy()
+        if flet_config.main_font_family:
+            page.theme = ft.Theme(font_family=flet_config.main_font_family)
+            page.dark_theme = ft.Theme(font_family=flet_config.main_font_family)
 
     async def set_dark_theme(self, page):
         page.theme_mode = ft.ThemeMode.DARK
         self.actual_theme = self.dark_theme
+        self._apply_typography(page)
         await ft.SharedPreferences().set("theme", "dark")
         page.bgcolor = self.actual_theme["background"]
         page.update()
@@ -33,6 +40,7 @@ class themes:
     async def set_light_theme(self, page):
         page.theme_mode = ft.ThemeMode.LIGHT
         self.actual_theme = self.light_theme
+        self._apply_typography(page)
         await ft.SharedPreferences().set("theme", "light")
         page.bgcolor = self.actual_theme["background"]
         page.update()

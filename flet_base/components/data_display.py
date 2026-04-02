@@ -1,7 +1,7 @@
 import flet as ft
 import flet_datatable2 as fdt
 
-
+from flet_base.config import flet_config
 from flet_base.themes.themes import instance_themes as themes
 
 
@@ -66,6 +66,7 @@ def expansion_panel(header, content=[], expanded=False):
                         header,
                         size=16,
                         color=themes.actual_theme["text_color"],
+                        font_family=flet_config.main_font_family,
                     ),
                 ]
             ),

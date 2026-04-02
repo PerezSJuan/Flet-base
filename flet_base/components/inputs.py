@@ -1,6 +1,7 @@
 import datetime
 import flet as ft
 from flet_color_pickers import ColorPicker
+from flet_base.config import flet_config
 
 from flet_base.themes.themes import instance_themes as themes
 
@@ -58,6 +59,7 @@ def text_input_autocomplete(
             ft.Text(
                 placeholder,
                 color=themes.actual_theme["text_color"],
+                font_family=flet_config.main_font_family,
             ),
             ft.AutoComplete(
                 suggestions=[ft.AutoCompleteSuggestion(key=s, value=s) for s in suggestions],

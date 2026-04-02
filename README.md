@@ -31,6 +31,11 @@ custom modules that live here.
    
    flet_config.default_language = "es"
    flet_config.default_theme_mode = "dark"
+   flet_config.font_files = {
+       "Inter": "assets/fonts/Inter-Regular.ttf",
+       "Inter Bold": "assets/fonts/Inter-Bold.ttf",
+   }
+   flet_config.main_font_family = "Inter"  # None keeps Flet default font
    # etc...
    ```
 
@@ -272,6 +277,29 @@ def main(page: ft.Page):
 
 ft.app(target=main)
 ```
+
+---
+
+## 🔤 Typography & Custom Fonts
+
+You can configure custom fonts globally using `flet_config` and apply one as your main UI font family. This affects all text helpers and component labels (including button text).
+
+```python
+from flet_base.config import flet_config
+
+# Optional: register multiple font files (local paths or URLs)
+flet_config.font_files = {
+    "Inter": "assets/fonts/Inter-Regular.ttf",
+    "Inter SemiBold": "assets/fonts/Inter-SemiBold.ttf",
+}
+
+# Main family used across components.
+# Keep None to use the default Flet font.
+flet_config.main_font_family = "Inter"
+```
+
+> [!TIP]
+> Set typography options before calling `themes.awake(page)` or building your UI so the font settings are applied from the beginning.
 
 ---
 

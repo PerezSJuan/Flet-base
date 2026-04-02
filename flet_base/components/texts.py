@@ -1,18 +1,27 @@
 import flet as ft
 
+from flet_base.config import flet_config
 from flet_base.themes.themes import instance_themes as themes
 
 
 def markdown(md, size=12):
     """It creates a markdown text with the specified markdown content and the main color of the theme"""
     style = ft.MarkdownStyleSheet()
-    style.p = ft.TextStyle(color=themes.actual_theme["text_color"], size=size)
+    style.p = ft.TextStyle(
+        color=themes.actual_theme["text_color"],
+        size=size,
+        font_family=flet_config.main_font_family,
+    )
     return ft.Markdown(
         value=md,
         selectable=True,
         md_style_sheet=style,
         extension_set=ft.MarkdownExtensionSet.GITHUB_WEB,
-        latex_style=ft.TextStyle(color=themes.actual_theme["text_color"], size=size),
+        latex_style=ft.TextStyle(
+            color=themes.actual_theme["text_color"],
+            size=size,
+            font_family=flet_config.main_font_family,
+        ),
     )
 
 
@@ -26,7 +35,14 @@ def title(
     """Title style text (large and bold by default)."""
     if color is None:
         color = themes.actual_theme["text_color"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def title_primary(
@@ -39,7 +55,14 @@ def title_primary(
     """Title style text using the primary theme color."""
     if color is None:
         color = themes.actual_theme["primary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def title_on_primary(
@@ -52,7 +75,14 @@ def title_on_primary(
     """Title style text using the 'on_primary' theme color."""
     if color is None:
         color = themes.actual_theme["on_primary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def title_secondary(
@@ -65,7 +95,14 @@ def title_secondary(
     """Title style text using the secondary theme color."""
     if color is None:
         color = themes.actual_theme["secondary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def title_on_secondary(
@@ -78,7 +115,14 @@ def title_on_secondary(
     """Title style text using the 'on_secondary' theme color."""
     if color is None:
         color = themes.actual_theme["on_secondary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def subtitle(
@@ -91,7 +135,14 @@ def subtitle(
     """Subtitle style text (medium size and normal weight by default)."""
     if color is None:
         color = themes.actual_theme["text_color"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def subtitle_primary(
@@ -104,7 +155,14 @@ def subtitle_primary(
     """Subtitle style text using the primary theme color."""
     if color is None:
         color = themes.actual_theme["primary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def subtitle_secondary(
@@ -117,7 +175,14 @@ def subtitle_secondary(
     """Subtitle style text using the secondary theme color."""
     if color is None:
         color = themes.actual_theme["secondary"]
-    return ft.Text(text, size=size, color=color, weight=weight, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        weight=weight,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def body(
@@ -129,7 +194,13 @@ def body(
     """Body style text (standard normal text)."""
     if color is None:
         color = themes.actual_theme["text_color"]
-    return ft.Text(text, size=size, color=color, selectable=selectable)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        selectable=selectable,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def caption(
@@ -141,22 +212,46 @@ def caption(
     """Small caption style text for notes or descriptions."""
     if color is None:
         color = themes.actual_theme["text_color"]
-    return ft.Text(text, size=size, color=color, italic=italic)
+    return ft.Text(
+        text,
+        size=size,
+        color=color,
+        italic=italic,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def error_text(text: str, size: int = 12, weight=None):
     """Themed red text for error messages."""
-    return ft.Text(text, size=size, color=themes.actual_theme["error"], weight=weight)
+    return ft.Text(
+        text,
+        size=size,
+        color=themes.actual_theme["error"],
+        weight=weight,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def success_text(text: str, size: int = 12, weight=None):
     """Themed green text for success messages."""
-    return ft.Text(text, size=size, color=themes.actual_theme["success"], weight=weight)
+    return ft.Text(
+        text,
+        size=size,
+        color=themes.actual_theme["success"],
+        weight=weight,
+        font_family=flet_config.main_font_family,
+    )
 
 
 def warning_text(text: str, size: int = 12, weight=None):
     """Themed yellow text for warning messages."""
-    return ft.Text(text, size=size, color=themes.actual_theme["warning"], weight=weight)
+    return ft.Text(
+        text,
+        size=size,
+        color=themes.actual_theme["warning"],
+        weight=weight,
+        font_family=flet_config.main_font_family,
+    )
 
 
 async def link(url: str, page: ft.Page, text: str = None, size: int = 12):
@@ -171,8 +266,12 @@ async def link(url: str, page: ft.Page, text: str = None, size: int = 12):
         content=ft.Text(
             text,
             color=themes.actual_theme["link"],
-            style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE),
+            style=ft.TextStyle(
+                decoration=ft.TextDecoration.UNDERLINE,
+                font_family=flet_config.main_font_family,
+            ),
             size=size,
+            font_family=flet_config.main_font_family,
         ),
         on_click=on_click,
     )

@@ -18,6 +18,7 @@ import inspect
 from typing import Any, Callable
 
 import flet as ft
+from flet_base.config import flet_config
 
 from .data import DataSystem
 from .middleware import MiddlewareResult
@@ -383,10 +384,21 @@ class FletRouter:
                             controls=[
                                 ft.Column(
                                     [
-                                        ft.Text("404", size=64, weight=ft.FontWeight.BOLD),
-                                        ft.Text(f"Route not found: {path}"),
+                                        ft.Text(
+                                            "404",
+                                            size=64,
+                                            weight=ft.FontWeight.BOLD,
+                                            font_family=flet_config.main_font_family,
+                                        ),
+                                        ft.Text(
+                                            f"Route not found: {path}",
+                                            font_family=flet_config.main_font_family,
+                                        ),
                                         ft.FilledButton(
-                                            "Back to start",
+                                            content=ft.Text(
+                                                "Back to start",
+                                                font_family=flet_config.main_font_family,
+                                            ),
                                             on_click=lambda _: page.push_route(self.route_init),
                                         ),
                                     ],

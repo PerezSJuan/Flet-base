@@ -1,14 +1,20 @@
 import flet as ft
+from flet_base.config import flet_config
 
 
 from flet_base.themes.themes import instance_themes as themes
+
+def _normalize_content(text):
+    if isinstance(text, str):
+        return ft.Text(text, font_family=flet_config.main_font_family)
+    return text
 
 
 def filled_btn(text, icon=None, on_click=None, enabled=True):
     """It creates a filled button with the specified text and click
     event handler and the main color of the theme"""
     return ft.FilledButton(
-        content=text,
+        content=_normalize_content(text),
         icon=icon,
         on_click=on_click,
         bgcolor=themes.actual_theme["primary"],
@@ -45,7 +51,7 @@ def text_btn(text, icon=None, on_click=None, enabled=True):
     and the option of an icon and click event handler and the main
     color of the theme"""
     return ft.Button(
-        content=text,
+        content=_normalize_content(text),
         icon=icon,
         on_click=on_click,
         color=themes.actual_theme["text_color"],
@@ -70,7 +76,7 @@ def btn(
     )
     color = light_color if themes.actual_theme == themes.light_theme else dark_color
     return ft.FilledButton(
-        content=text,
+        content=_normalize_content(text),
         icon=icon,
         on_click=on_click,
         bgcolor=bgcolor,

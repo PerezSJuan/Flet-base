@@ -62,6 +62,14 @@ class FletBaseConfig:
         self.dark_theme_override: Optional[Dict[str, str]] = None
         
         self.default_theme_mode: str = "light"  # "light" or "dark"
+        
+        # --- Typography Configuration ---
+        # Map font aliases/families to local files or URLs accepted by Flet.
+        # Example: {"Inter": "assets/fonts/Inter-Regular.ttf"}
+        self.font_files: Dict[str, str] = {}
+        # Main UI font family used across components.
+        # If None, Flet's default font is used.
+        self.main_font_family: Optional[str] = None
 
         # --- Layout Configuration ---
         self.default_layout_spacing: int = 10
