@@ -4,13 +4,14 @@ from flet_base.config import flet_config
 
 from flet_base.themes.themes import instance_themes as themes
 
+
 def _normalize_content(text):
     if isinstance(text, str):
         return ft.Text(text, font_family=flet_config.main_font_family)
     return text
 
 
-def filled_btn(text, icon=None, on_click=None, enabled=True):
+def filled_btn(text, icon=None, on_click=None, enabled=True, height=None, width=None):
     """It creates a filled button with the specified text and click
     event handler and the main color of the theme"""
     return ft.FilledButton(
@@ -20,10 +21,12 @@ def filled_btn(text, icon=None, on_click=None, enabled=True):
         bgcolor=themes.actual_theme["primary"],
         color=themes.actual_theme["on_primary"],
         disabled=not enabled,
+        height=height,
+        width=width,
     )
 
 
-def icon_filled_btn(icon, on_click=None, enabled=True):
+def icon_filled_btn(icon, on_click=None, enabled=True, icon_size=None, padding=None, splash_radius=None):
     """It creates a filled button with the specified icon and click
     event handler and the main color of the theme"""
     return ft.FilledIconButton(
@@ -32,21 +35,27 @@ def icon_filled_btn(icon, on_click=None, enabled=True):
         bgcolor=themes.actual_theme["primary"],
         icon_color=themes.actual_theme["on_primary"],
         disabled=not enabled,
+        icon_size=icon_size,
+        padding=padding,
+        splash_radius=splash_radius,
     )
 
 
-def icon_btn(icon, on_click=None, enabled=True):
+def icon_btn(icon, on_click=None, enabled=True, icon_size=None, padding=None, splash_radius=None):
     """It creates a empty button with the specified icon and click
     event handler and the main color of the theme"""
     return ft.IconButton(
         icon=icon,
         on_click=on_click,
         disabled=not enabled,
+        icon_size=icon_size,
         icon_color=themes.actual_theme["primary"],
+        padding=padding,
+        splash_radius=splash_radius,
     )
 
 
-def text_btn(text, icon=None, on_click=None, enabled=True):
+def text_btn(text, icon=None, on_click=None, enabled=True, height=None, width=None):
     """It creates a empty (no bg) button with the specified text
     and the option of an icon and click event handler and the main
     color of the theme"""
@@ -56,6 +65,8 @@ def text_btn(text, icon=None, on_click=None, enabled=True):
         on_click=on_click,
         color=themes.actual_theme["text_color"],
         disabled=not enabled,
+        height=height,
+        width=width,
     )
 
 
@@ -68,6 +79,8 @@ def btn(
     light_color="#000000",
     dark_bgcolor="#121212",
     dark_color="#FFFFFF",
+    height=None,
+    width=None,
 ):
     """It creates a empty button with the specified text and the
     option of an icon and click event handler and choosen color"""
@@ -82,4 +95,6 @@ def btn(
         bgcolor=bgcolor,
         color=color,
         disabled=not enabled,
+        height=height,
+        width=width,
     )
