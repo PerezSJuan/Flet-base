@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict, Callable
 
 # --- Default Themes ---
 DEFAULT_LIGHT_THEME = {
@@ -36,6 +36,13 @@ DEFAULT_DARK_THEME = {
 }
 
 
+# --- Default Key Configuration ---
+DEFAULT_KEY_CONFIG = {
+    "mod+s": lambda: print("Hello from Save!"),
+    "mod+c": lambda: print("Hello from Copy!"),
+}
+
+
 class FletBaseConfig:
     """
     Global configuration object for Flet-base.
@@ -56,13 +63,16 @@ class FletBaseConfig:
         # Custom themes MUST follow this key structure as components rely on them.
         self.light_theme: Dict[str, str] = DEFAULT_LIGHT_THEME.copy()
         self.dark_theme: Dict[str, str] = DEFAULT_DARK_THEME.copy()
-        
+
         # Backward compatibility / specific overrides
         self.light_theme_override: Optional[Dict[str, str]] = None
         self.dark_theme_override: Optional[Dict[str, str]] = None
-        
+
         self.default_theme_mode: str = "light"  # "light" or "dark"
-        
+
+        # --- Keyboard Shortcuts Configuration ---
+        self.keyboard_shortcuts: Dict[str, Callable] = DEFAULT_KEY_CONFIG
+
         # --- Typography Configuration ---
         # Map font aliases/families to local files or URLs accepted by Flet.
         # Example: {"Inter": "assets/fonts/Inter-Regular.ttf"}

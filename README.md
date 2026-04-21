@@ -300,8 +300,70 @@ flet_config.main_font_family = "Inter"
 
 > [!TIP]
 > Set typography options before calling `themes.awake(page)` or building your UI so the font settings are applied from the beginning.
-
----
+ 
+ ---
+ 
+ # ⌨️ Keyboard Shortcut Manager
+ 
+ A modular and OS-agnostic system to handle keyboard events. It allows you to define shortcuts like `mod+s` which automatically resolves to `Ctrl+s` on Windows/Linux and `Cmd+s` on macOS.
+ 
+ ## 🚀 Key Features
+ 
+ * **OS-Agnostic**: Use `mod` alias for cross-platform compatibility.
+ * **Direct Mapping**: Map key combinations directly to sync or async functions.
+ * **Async Support**: Automatically handles asynchronous callbacks.
+ * **Conflict Detection**: Warns if multiple actions are assigned to the same shortcut.
+ * **Robust Normalization**: Handles platform-specific keys (like `cmd`, `win`, `command`) and prevents duplicate modifier detection.
+ 
+ ## 🛠️ API Reference
+ 
+ #### **`ShortcutManager()`**
+ 
+ Creates a new manager instance.
+ 
+ #### **`register(shortcut_str, callback)`**
+ 
+ Registers a single shortcut.
+ - **`shortcut_str`**: String representation e.g., `"mod+s"`, `"ctrl+shift+p"`, `"alt+f4"`.
+ - **`callback`**: The function (sync or async) to execute.
+ 
+ #### **`register_many(shortcuts_dict)`**
+ 
+ Registers multiple shortcuts at once from a dictionary mapping shortcut strings to functions.
+ 
+ #### **`handle_event(e: ft.KeyboardEvent)`**
+ 
+ The primary event handler to be connected to `page.on_keyboard_event`.
+ 
+ ### 💡 Implementation Example
+ 
+ ```python
+ import flet as ft
+ from flet_base.keyboard_shortcuts import ShortcutManager
+ from flet_base.config import DEFAULT_KEY_CONFIG
+ 
+ async def main(page: ft.Page):
+     manager = ShortcutManager()
+ 
+     # 1. Register from global config (if defined as dict of callables)
+     manager.register_many(DEFAULT_KEY_CONFIG)
+ 
+     # 2. Register manually
+     async def on_save():
+         print("Saving progress...")
+ 
+     manager.register("mod+s", on_save)
+     manager.register("mod+shift+p", lambda: print("Command Palette Open"))
+ 
+     # 3. Connect to page
+     page.on_keyboard_event = manager.handle_event
+     
+     page.add(ft.Text("Press Ctrl+S (or Cmd+S on Mac) to trigger actions."))
+ 
+ ft.app(main)
+ ```
+ 
+ ---
 
 # 🔘 Components: Buttons
 
